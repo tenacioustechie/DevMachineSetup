@@ -7,6 +7,8 @@ This script sets up my windows development machine using winget. It was initiall
 - You need to be using Windows 10 (1807 or higher) or windows 11.
 - You need 'App Installer' installed (usually included in base windows install I think, or available on microsoft store)
 - Winget https://learn.microsoft.com/en-us/windows/package-manager/
+- Enable running of scripts for your current user
+  `set-executionPolicy -Scope CurrentUser RemoteSigned`
 
 Winget CLI should be available on the system.
 
