@@ -37,16 +37,15 @@ else {
 # $settingsJson | Out-File $settingsPath -Encoding utf8
 
 # Setup Dev Drives
-Write-Output "Setting up Dev Drives"
-New-Item -Path "C:\" -Name "DevDrives" -ItemType "directory"
+#Write-Output "Setting up Dev Drives"
+#New-Item -Path "C:\" -Name "DevDrives" -ItemType "directory"
+#New-Item -Path "C:\DevDrives" -Name "Nuget" -ItemType "directory"
 
-New-Item -Path "C:\DevDrives" -Name "Nuget" -ItemType "directory"
-
-New-VHD -Path c:\DevDrives\NugetCache.vhdx -SizeBytes 50GB -Dynamic | 
-Mount-VHD -Passthru | 
-Initialize-Disk -PartitionStyle GPT -FriendlyName NugetCacheDisk -Passthru | 
-New-Partition -NoDriveLetter -Path C:\DevDrives\Nuget -UseMaximumSize | 
-Format-Volume -DevDrive -Confirm:$false -FileSystemLabel NugetCache -Force
+#New-VHD -Path c:\DevDrives\NugetCache.vhdx -SizeBytes 50GB -Dynamic | 
+#Mount-VHD -Passthru | 
+#Initialize-Disk -PartitionStyle GPT -FriendlyName NugetCacheDisk -Passthru | 
+#New-Partition -NoDriveLetter -Path C:\DevDrives\Nuget -UseMaximumSize | 
+#Format-Volume -DevDrive -Confirm:$false -FileSystemLabel NugetCache -Force
 
 # May need some of these options
 # Mount-VHD -NoDriveLetter -Path C:\DevDrives\Nuget -Passthru
@@ -64,8 +63,8 @@ $apps = @(
     @{name = "JoachimEibl.KDiff3"},
     @{name = "Git.Git" }, 
     @{name = "GitExtensionsTeam.GitExtensions"},
-#    @{name = "GitHub.cli" },
-#    @{name = "GitHub.GitHubDesktop" },
+    @{name = "GitHub.cli" },
+    @{name = "GitHub.GitHubDesktop" },
     @{name = "CoreyButler.NVMforWindows" },
 #    @{name = "Docker.DockerDesktop" },
 #    @{name = "Microsoft.DotNet.SDK.3_1" },

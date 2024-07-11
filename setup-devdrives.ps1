@@ -6,8 +6,23 @@ function CreateAndMountDevDrive($DiskName, $DiskSize, $BasePath, $VariableName =
   $VhdPath = "$BasePath\$DiskName.vdhx"
   # Create the mount point folder
   New-Item -Path $BasePath -Name $DiskName -ItemType "directory"
+
   # Create the Vhdx disk image
-  "CREATE VDISK FILE=`"$VhdPath`" MAXIMUM=$DiskSize TYPE=EXPANDABLE" | diskpart
+  #"CREATE VDISK FILE=`"$VhdPath`" MAXIMUM=$DiskSize TYPE=EXPANDABLE" | diskpart
+
+  # Write the DiskPart script to a file
+  $diskpartScriptPath = "$BasePath\CreateVHDXdiskpartcommand.txt"
+  $diskpartScriptContent = @"
+CREATE VDISK FILE=`"$VhdPath`" MAXIMUM=$DiskSize TYPE=EXPANDABLE
+"@
+  $diskpartScriptContent | Out-File -FilePath $diskpartScriptPath -Force
+  # Execute the DiskPart script
+  $diskpartOutputPath = "$BasePath\DiskPartOutput.txt"
+  Start-Process -FilePath "diskpart.exe" -ArgumentList "/s $diskpartScriptPath" -RedirectStandardOutput $diskpartOutputPath -Wait
+  $diskpartOutput = Get-Content -Path $diskpartOutputPath
+  $diskpartOutput
+  #Remove-Item -Path $diskpartScriptPath -Force
+
   # Mount the Vhdx disk image
   Mount-DiskImage -ImagePath $VhdPath -NoDriveLetter
   # Get the disk number of the mounted VHD
