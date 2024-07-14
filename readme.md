@@ -2,7 +2,26 @@
 
 This script sets up my windows development machine using winget. It was initially used in Windows 11.
 
-# Requirements
+# To do
+
+- script dev drive creation for node_modules global cache + set global environment variable for it
+- script dev drive creation for nuget package cache + set global environment variable for it
+- script dev drive creation for c:\code directory mount point
+
+# Quick Start
+
+Run this on a new machine in powershell, if you use an admin prompt, it wont prompt you for each application install.
+
+```bash
+set-executionPolicy -Scope CurrentUser RemoteSigned
+.\setup.ps1
+```
+
+TODO: add dev drive steps here
+
+# Full Documentation
+
+## Requirements
 
 - You need to be using Windows 10 (1807 or higher) or windows 11.
 - You need 'App Installer' installed (usually included in base windows install I think, or available on microsoft store)
@@ -12,7 +31,7 @@ This script sets up my windows development machine using winget. It was initiall
 
 Winget CLI should be available on the system.
 
-# Winget Commands
+## Winget Commands
 
 Winget has several useful commands
 
@@ -24,7 +43,7 @@ winget install [app-id]
 winget info
 ```
 
-# Winget Install
+## Winget Install
 
 Several useful options when installing from a script.
 
@@ -35,16 +54,10 @@ winget install --silent [app-name]
 
 - --silent installs hiding any gui or popup confirmations, useful when scripting several installations at once.
 
-# Other Setup steps
+## Other Setup steps
 
 Setup Win Dev Drive and mount in c:\code directory for code to go into before cloning code
 https://learn.microsoft.com/en-us/windows/dev-drive/
-
-# To do
-
-- script dev drive creation for node_modules global cache + set global environment variable for it
-- script dev drive creation for nuget package cache + set global environment variable for it
-- script dev drive creation for c:\code directory mount point
 
 # A Note on HyperV
 

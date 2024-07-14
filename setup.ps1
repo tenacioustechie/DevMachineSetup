@@ -66,20 +66,20 @@ $apps = @(
     @{name = "GitHub.cli" },
     @{name = "GitHub.GitHubDesktop" },
     @{name = "CoreyButler.NVMforWindows" },
-#    @{name = "Docker.DockerDesktop" },
+    @{name = "Docker.DockerDesktop" },
 #    @{name = "Microsoft.DotNet.SDK.3_1" },
-#    @{name = "Microsoft.DotNet.SDK.6"  },
-#    @{name = "Microsoft.DotNet.SDK.7" },
-    @{name = "Microsoft.DotNet.SDK.8" },
 #    @{name = "Microsoft.DotNet.HostingBundle.3_1"},
-#    @{name = "Microsoft.DotNet.HostingBundle.6"},
-#    @{name = "Microsoft.DotNet.HostingBundle.7"},
-    @{name = "Microsoft.DotNet.HostingBundle.8"},
 #    @{name = "Microsoft.DotNet.AspNetCore.3_1"},
-#    @{name = "Microsoft.DotNet.AspNetCore.6"},
+    @{name = "Microsoft.DotNet.SDK.6"  },
+    @{name = "Microsoft.DotNet.HostingBundle.6"},
+    @{name = "Microsoft.DotNet.AspNetCore.6"},
+#    @{name = "Microsoft.DotNet.SDK.7" },
+#    @{name = "Microsoft.DotNet.HostingBundle.7"},
 #    @{name = "Microsoft.DotNet.AspNetCore.7"},
+    @{name = "Microsoft.DotNet.SDK.8" },
+    @{name = "Microsoft.DotNet.HostingBundle.8"},
     @{name = "Microsoft.DotNet.AspNetCore.8"},
-#    @{name = "Canonical.Ubuntu.2204" },
+    @{name = "Canonical.Ubuntu.2204" },
     @{name = "Python.Python.3.10" },
 #    @{name = "Oracle.MySQL"},
 #    @{name = "Oracle.MySQLWorkbench"},
@@ -108,10 +108,10 @@ Foreach ($app in $apps) {
 }
 
 # Install NVM Packages
-Write-Output "Installing NVM Packages"
-nvm install 20.15.0
-nvm use 20.15.0
-npm install -g @angular/cli
+#Write-Output "Installing NVM Packages"
+#nvm install 20.15.0
+#nvm use 20.15.0
+#npm install -g @angular/cli
 
 
 
@@ -126,5 +126,8 @@ Foreach ($app in $apps)
   Get-AppxPackage -allusers $app | Remove-AppxPackage
 }
 
-#Setup WSL
+# Setup WSL and set default version to 2
 wsl --install
+wsl --set-default-version 2
+
+Write-Host "Done"
