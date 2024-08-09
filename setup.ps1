@@ -53,6 +53,7 @@ else {
 #Install New apps
 Write-Output "Installing Apps"
 $apps = @(
+    @{name = "Amazon.AWSCLI" },
 #    @{name = "Microsoft.AzureCLI" }, 
 #    @{name = "Microsoft.Azure.StorageExplorer" }, 
 #    @{name = "Microsoft.PowerShell" }, 

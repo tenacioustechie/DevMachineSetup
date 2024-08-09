@@ -10,7 +10,7 @@ This script sets up my windows development machine using winget. It was initiall
 
 # Quick Start
 
-Run this on a new machine in powershell, if you use an admin prompt, it wont prompt you for each application install.
+Run this on a new machine in powershell. Note: use a user powershell prompt, it will require you to elevate for admin required installations, but if you install user apps as admin that may fail, or cause you issues later. If you do use an admin prompt, it wont prompt you for each application install.
 
 ```bash
 set-executionPolicy -Scope CurrentUser RemoteSigned
