@@ -1,0 +1,6 @@
+CREATE VDISK FILE="C:\DevDrives\NodeCache.vhdx" MAXIMUM=52000 TYPE=EXPANDABLE
+ATTACH VDISK
+convert GPT
+create partition primary
+format fs=ReFS quick label=NodeCache
+assign mount="C:\DevDrives\Nuget"
