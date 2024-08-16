@@ -3,19 +3,11 @@
 #Install New apps
 Write-Output "Installing Apps"
 $apps = @(
-    @{name = "Amazon.AWSCLI" },
-#    @{name = "Microsoft.AzureCLI" }, 
-#    @{name = "Microsoft.Azure.StorageExplorer" }, 
+    @{name = "Canonical.Ubuntu.2204" },
     @{name = "Microsoft.PowerShell" }, 
-    @{name = "Microsoft.VisualStudioCode" }, 
     @{name = "Microsoft.WindowsTerminal"; source = "msstore" }, 
     @{name = "JanDeDobbeleer.OhMyPosh" },
     @{name = "Microsoft.PowerToys" }, 
-    @{name = "JoachimEibl.KDiff3"},
-    @{name = "Git.Git" }, 
-    @{name = "GitExtensionsTeam.GitExtensions"},
-    @{name = "GitHub.cli" },
-    @{name = "GitHub.GitHubDesktop" },
     @{name = "CoreyButler.NVMforWindows" },
 #    @{name = "Node.js" },
     @{name = "Docker.DockerDesktop" },
@@ -31,15 +23,23 @@ $apps = @(
     @{name = "Microsoft.DotNet.SDK.8" },
     @{name = "Microsoft.DotNet.HostingBundle.8"},
     @{name = "Microsoft.DotNet.AspNetCore.8"},
-    @{name = "Canonical.Ubuntu.2204" },
+    @{name = "Microsoft.VisualStudioCode" }, 
+    @{name = "Visual Studio Professional 2022" },
+    @{name = "JoachimEibl.KDiff3"},
+    @{name = "Git.Git" }, 
+    @{name = "GitExtensionsTeam.GitExtensions"},
+    @{name = "GitHub.cli" },
+    @{name = "GitHub.GitHubDesktop" },
     @{name = "Python.Python.3.10" },
-    @{name = "Oracle.MySQL"},
-    @{name = "Oracle.MySQLWorkbench"},
-    @{name = "Oracle.MySQLShell"},
+#    @{name = "Oracle.MySQL"},
+#    @{name = "Oracle.MySQLWorkbench"},
+#    @{name = "Oracle.MySQLShell"},
     @{name = "JetBrains.DataGrip"},
-    @{name = "Visual Studio Professional 2022" }
+#    @{name = "Spotify.Spotify"}
+#    @{name = "Microsoft.AzureCLI" }, 
+#    @{name = "Microsoft.Azure.StorageExplorer" }, 
     @{name = "Amazon.AWSVPNClient"},
-    @{name = "Spotify.Spotify"}
+    @{name = "Amazon.AWSCLI" },
 );
 
 Foreach ($app in $apps) {
