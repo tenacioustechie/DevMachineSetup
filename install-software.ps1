@@ -31,15 +31,15 @@ $apps = @(
     @{name = "GitHub.cli" },
     @{name = "GitHub.GitHubDesktop" },
     @{name = "Python.Python.3.10" },
-#    @{name = "Oracle.MySQL"},
-#    @{name = "Oracle.MySQLWorkbench"},
-#    @{name = "Oracle.MySQLShell"},
-    @{name = "JetBrains.DataGrip"},
+    @{name = "Oracle.MySQL"},
+    @{name = "Oracle.MySQLWorkbench"},
+    @{name = "Oracle.MySQLShell"},
+#    @{name = "JetBrains.DataGrip"},
 #    @{name = "Spotify.Spotify"}
 #    @{name = "Microsoft.AzureCLI" }, 
 #    @{name = "Microsoft.Azure.StorageExplorer" }, 
     @{name = "Amazon.AWSVPNClient"},
-    @{name = "Amazon.AWSCLI" },
+    @{name = "Amazon.AWSCLI" }
 );
 
 Foreach ($app in $apps) {
