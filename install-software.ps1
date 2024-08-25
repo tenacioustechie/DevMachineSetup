@@ -1,9 +1,19 @@
 # NOTE: do NOT run this as admin, it works better asking for admin on each install
 
+
+# Setup WSL and set default version to 2
+Write-Host "Installing and setting up Windows subsystem for Linux (WSL)..."
+Write-Host "It will ask for a password, please enter a password for the WSL user, and remember it..."
+Write-Host "Please exit the WSL distribution by running 'exit' once WSL is installed..."
+Read-Host -Prompt "Press Enter to continue"
+wsl --set-default-version 2
+wsl --update
+wsl --install -d Ubuntu
+
 #Install New apps
 Write-Output "Installing Apps"
 $apps = @(
-    @{name = "Canonical.Ubuntu.2204" },
+    @{name = "Ubuntu" },
     @{name = "Microsoft.PowerShell" }, 
     @{name = "Microsoft.WindowsTerminal"; source = "msstore" }, 
     @{name = "JanDeDobbeleer.OhMyPosh" },
@@ -63,11 +73,5 @@ Foreach ($app in $apps) {
 #nvm install 20.15.0
 #nvm use 20.15.0
 #npm install -g @angular/cli
-
-
-
-# Setup WSL and set default version to 2
-wsl --install
-wsl --set-default-version 2
 
 Write-Host "Done"
