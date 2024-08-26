@@ -1,0 +1,16 @@
+select vdisk file="d:\DevDrives\NugetCache-Disk.vdhx"
+attach vdisk
+assign mount="d:\DevDrives\NugetCache
+
+select vdisk file="d:\DevDrives\NpmCache-Disk.vdhx"
+attach vdisk
+assign mount="d:\DevDrives\NpmCache
+
+select vdisk file="d:\DevDrives\NugetCache-Disk.vdhx"
+attach vdisk
+assign mount="d:\DevDrives\NugetCache
+
+select vdisk file="d:\DevDrives\NugetCache-Disk.vdhx"
+attach vdisk
+assign mount="d:\DevDrives\NugetCache
+
