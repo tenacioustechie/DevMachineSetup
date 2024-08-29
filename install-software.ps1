@@ -49,7 +49,8 @@ $apps = @(
 #    @{name = "Microsoft.AzureCLI" }, 
 #    @{name = "Microsoft.Azure.StorageExplorer" }, 
     @{name = "Amazon.AWSVPNClient"},
-    @{name = "Amazon.AWSCLI" }
+    @{name = "Amazon.AWSCLI" },
+    @{name = "Postman.Postman" }
 );
 
 Foreach ($app in $apps) {

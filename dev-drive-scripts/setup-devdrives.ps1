@@ -1,6 +1,9 @@
 #Requires -RunAsAdministrator
 # This script will create a DevDrive as a VHDX disk image and mount it to a folder and setup environment variables for npm cache and node cache
 
+# Script doesn't seem to work, creates drives, but they dont reattach on reboot, and are corrupt. They also may not actually be a 'dev drive' even with ReFS format
+return;
+
 function CreateDirectory($Path, $Name) {
   New-Item -Path $Path -Name $Name -ItemType "directory" -ErrorAction SilentlyContinue
   return
@@ -16,7 +19,7 @@ function CreateDirectory($Path, $Name) {
 function CreateAndMountDevDrive($DiskName, $DiskSize, $MountBasePath, $DriveBasePath, $VariableName = $null) {
   # Setup VHDX Disk Path
   Write-Host "Checking if VHDX Disk $DiskName already exists..."
-  $VhdPath = "$DriveBasePath\$DiskName-Disk.vdhx"
+  $VhdPath = "$DriveBasePath\$DiskName-Disk.vhdx"
   if (Test-Path $VhdPath) {
     Write-Host "ERROR: $VhdPath already exists" --ForgroundColor Red
     return

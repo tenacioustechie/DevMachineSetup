@@ -34,6 +34,8 @@ You can customise what is installed by commenting in and out the packages in the
 
 ## Setup Dev Drives
 
+NOTE: manual setup recomended at this point in time, scripted version doesn't work full.
+
 Dev drives are a new Microsoft Windows feature that can improve build times and performance when coding. This is mostly focused at your code directory, npm cache directory, and nuget package cache directory as they contain thousands of files.
 
 Use the 'About this PC' in control panel to work out what edition of Windows 11 you are running.
@@ -46,7 +48,7 @@ cd dev-drive-setup
 .\setup-devdrives.ps1
 ```
 
-If you are manually setting up dev drives then you should create these directorys on D: drive or C: drive. (I use a separate D: drive if possible or on desktop so that the OS is left alone. I'm unsure if it actually helps performance or not).
+If you are manually setting up dev drives using 'Disks & Volumes' Settings app, then you should create these directorys on D: drive or C: drive. (I use a separate D: drive if possible or on desktop so that the OS is left alone. I'm unsure if it actually helps performance or not).
 
 - Nuget Cache directory -> mounted in D:\DevDrives\NugetCache
 - Npm Cache directory -> mounted in D:\DevDrives\NpmCache
@@ -56,6 +58,7 @@ Each directory needs a dev drive setup and mounted. Then you can run these state
 
 ```bash
 # make sure paths are correct for what you have setup
+# Run these in an 'admin' terminal powershell window
 setx /M NUGET_PACKAGES D:\DevDrives\NugetCache
 setx /M npm_config_cache D:\packages\NpmCache
 ```
