@@ -44,13 +44,19 @@ $apps = @(
     @{name = "Oracle.MySQL"},
     @{name = "Oracle.MySQLWorkbench"},
     @{name = "Oracle.MySQLShell"},
-#    @{name = "JetBrains.DataGrip"},
-#    @{name = "Spotify.Spotify"}
+    @{name = "JetBrains.DataGrip"},
+    @{name = "Spotify.Spotify"}
 #    @{name = "Microsoft.AzureCLI" }, 
 #    @{name = "Microsoft.Azure.StorageExplorer" }, 
+#   @{name = "Microsoft.AzureDataStudio" },
+#   @{name = "OpenVPNTechnologies.OpenVPN" },
     @{name = "Amazon.AWSVPNClient"},
     @{name = "Amazon.AWSCLI" },
-    @{name = "Postman.Postman" }
+    @{name = "Postman.Postman" },
+    @{name = "Google.Chrome" },
+    @{name = "Mozilla.Firefox" },
+    @{name = "AgileBits.1Password" },
+    @{name = "Notion.Notion" }
 );
 
 Foreach ($app in $apps) {
