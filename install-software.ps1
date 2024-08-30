@@ -57,6 +57,7 @@ $apps = @(
     @{name = "Mozilla.Firefox" },
     @{name = "AgileBits.1Password" },
     @{name = "Notion.Notion" }
+#    @{name = "LINQPad.LINQPad.8" }
 );
 
 Foreach ($app in $apps) {
