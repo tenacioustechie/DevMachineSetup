@@ -35,18 +35,3 @@ else {
 #     }
 # "@;
 # $settingsJson | Out-File $settingsPath -Encoding utf8
-
-# Setup Dev Drives
-#Write-Output "Setting up Dev Drives"
-#New-Item -Path "C:\" -Name "DevDrives" -ItemType "directory"
-#New-Item -Path "C:\DevDrives" -Name "Nuget" -ItemType "directory"
-
-#New-VHD -Path c:\DevDrives\NugetCache.vhdx -SizeBytes 50GB -Dynamic | 
-#Mount-VHD -Passthru | 
-#Initialize-Disk -PartitionStyle GPT -FriendlyName NugetCacheDisk -Passthru | 
-#New-Partition -NoDriveLetter -Path C:\DevDrives\Nuget -UseMaximumSize | 
-#Format-Volume -DevDrive -Confirm:$false -FileSystemLabel NugetCache -Force
-
-# May need some of these options
-# Mount-VHD -NoDriveLetter -Path C:\DevDrives\Nuget -Passthru
-
