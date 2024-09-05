@@ -45,11 +45,11 @@ $apps = @(
     @{name = "Oracle.MySQLWorkbench"},
     @{name = "Oracle.MySQLShell"},
     @{name = "JetBrains.DataGrip"},
-    @{name = "Spotify.Spotify"}
+#    @{name = "Spotify.Spotify"}
 #    @{name = "Microsoft.AzureCLI" }, 
 #    @{name = "Microsoft.Azure.StorageExplorer" }, 
-#   @{name = "Microsoft.AzureDataStudio" },
-#   @{name = "OpenVPNTechnologies.OpenVPN" },
+#    @{name = "Microsoft.AzureDataStudio" },
+#    @{name = "OpenVPNTechnologies.OpenVPN" },
     @{name = "Amazon.AWSVPNClient"},
     @{name = "Amazon.AWSCLI" },
     @{name = "Postman.Postman" },
@@ -77,9 +77,18 @@ Foreach ($app in $apps) {
 }
 
 # Install NVM Packages
-#Write-Output "Installing NVM Packages"
-#nvm install 20.15.0
-#nvm use 20.15.0
-#npm install -g @angular/cli
+Write-Host "Installing NVM Packages"
+nvm install 20.17.0
+nvm use 20.17.0
+npm install -g @angular/cli
+Write-Host ""
+
+# NOTE: this command lists IIS features that could be installed
+# Get-WindowsOptionalFeature -Online | Where-Object FeatureName -like 'IIS-*' | Format-Table -AutoSize
+Write-Host "Installing IIS"
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45 -ALL
+Enable-WindowsOptionalFeature -Online -FeatureName IIS-ManagementScriptingTools
+Write-Host ""
 
 Write-Host "Done"
