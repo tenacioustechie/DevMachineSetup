@@ -36,6 +36,7 @@ $apps = @(
     @{name = "Microsoft.VisualStudioCode" }, 
     @{name = "Visual Studio Professional 2022" },
     @{name = "JoachimEibl.KDiff3"},
+    @{name = "SublimeHQ.SublimeText.4"},
     @{name = "Git.Git" }, 
     @{name = "GitExtensionsTeam.GitExtensions"},
     @{name = "GitHub.cli" },
@@ -45,7 +46,7 @@ $apps = @(
     @{name = "Oracle.MySQLWorkbench"},
     @{name = "Oracle.MySQLShell"},
     @{name = "JetBrains.DataGrip"},
-#    @{name = "Spotify.Spotify"}
+    @{name = "Spotify.Spotify"}
 #    @{name = "Microsoft.AzureCLI" }, 
 #    @{name = "Microsoft.Azure.StorageExplorer" }, 
 #    @{name = "Microsoft.AzureDataStudio" },
@@ -57,7 +58,7 @@ $apps = @(
     @{name = "Mozilla.Firefox" },
     @{name = "AgileBits.1Password" },
     @{name = "Notion.Notion" }
-#    @{name = "LINQPad.LINQPad.8" }
+    @{name = "LINQPad.LINQPad.8" }
 );
 
 Foreach ($app in $apps) {
