@@ -1,0 +1,10 @@
+---
+# Handlers for macOS preferences
+
+- name: restart dock
+  command: killall Dock
+  ignore_errors: yes
+
+- name: restart finder
+  command: killall Finder
+  ignore_errors: yes

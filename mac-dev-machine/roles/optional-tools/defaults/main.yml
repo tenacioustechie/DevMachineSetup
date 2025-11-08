@@ -1,0 +1,9 @@
+---
+# Default variables for optional-tools role
+
+install_xcode: false
+xcode_version: "latest"
+
+ios_simulator_devices:
+  - "iPhone 15"
+  - "iPad Pro 12.9-inch"

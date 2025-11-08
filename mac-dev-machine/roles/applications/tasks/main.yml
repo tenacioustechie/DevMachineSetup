@@ -1,0 +1,158 @@
+---
+# Applications Role
+# Configures application-specific settings
+
+- name: Configure VS Code
+  tags: ['vscode']
+  block:
+    - name: Check if VS Code is installed
+      stat:
+        path: /Applications/Visual Studio Code.app
+      register: vscode_check
+
+    - name: Install VS Code extensions
+      command: "code --install-extension {{ item }}"
+      loop: "{{ vscode_extensions }}"
+      when: vscode_check.stat.exists
+      register: vscode_install
+      changed_when: "'is already installed' not in vscode_install.stdout"
+      failed_when: false
+
+    - name: Create VS Code settings directory
+      file:
+        path: "{{ user_home }}/Library/Application Support/Code/User"
+        state: directory
+        mode: '0755'
+      when: vscode_check.stat.exists
+
+    - name: Configure VS Code settings
+      copy:
+        content: |
+          {
+            "editor.fontFamily": "JetBrains Mono, Fira Code, Menlo, Monaco, 'Courier New', monospace",
+            "editor.fontSize": 14,
+            "editor.fontLigatures": true,
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
+            "editor.codeActionsOnSave": {
+              "source.fixAll.eslint": "explicit"
+            },
+            "files.autoSave": "onFocusChange",
+            "workbench.iconTheme": "material-icon-theme",
+            "terminal.integrated.fontFamily": "Hack Nerd Font Mono, JetBrains Mono",
+            "terminal.integrated.fontSize": 13,
+            "git.autofetch": true,
+            "git.confirmSync": false,
+            "explorer.confirmDelete": false,
+            "explorer.confirmDragAndDrop": false,
+            "[typescript]": {
+              "editor.defaultFormatter": "esbenp.prettier-vscode"
+            },
+            "[javascript]": {
+              "editor.defaultFormatter": "esbenp.prettier-vscode"
+            },
+            "[json]": {
+              "editor.defaultFormatter": "esbenp.prettier-vscode"
+            },
+            "[csharp]": {
+              "editor.defaultFormatter": "ms-dotnettools.csharp"
+            }
+          }
+        dest: "{{ user_home }}/Library/Application Support/Code/User/settings.json"
+        mode: '0644'
+      when: vscode_check.stat.exists
+
+    - name: Display VS Code configuration status
+      debug:
+        msg: "VS Code {{ 'configured successfully' if vscode_check.stat.exists else 'not found - skipping configuration' }}"
+
+- name: Configure iTerm2
+  tags: ['iterm2']
+  block:
+    - name: Check if iTerm2 is installed
+      stat:
+        path: /Applications/iTerm.app
+      register: iterm_check
+
+    - name: Set iTerm2 preferences location
+      community.general.osx_defaults:
+        domain: com.googlecode.iterm2
+        key: PrefsCustomFolder
+        type: string
+        value: "{{ user_home }}/.config/iterm2"
+        state: present
+      when: iterm_check.stat.exists
+
+    - name: Enable loading preferences from custom folder
+      community.general.osx_defaults:
+        domain: com.googlecode.iterm2
+        key: LoadPrefsFromCustomFolder
+        type: bool
+        value: true
+        state: present
+      when: iterm_check.stat.exists
+
+    - name: Create iTerm2 config directory
+      file:
+        path: "{{ user_home }}/.config/iterm2"
+        state: directory
+        mode: '0755'
+      when: iterm_check.stat.exists
+
+    - name: Display iTerm2 configuration status
+      debug:
+        msg: "iTerm2 {{ 'configured successfully' if iterm_check.stat.exists else 'not found - skipping configuration' }}"
+
+- name: Configure Rectangle (window manager)
+  tags: ['rectangle']
+  block:
+    - name: Check if Rectangle is installed
+      stat:
+        path: /Applications/Rectangle.app
+      register: rectangle_check
+
+    - name: Configure Rectangle to launch at login
+      command: osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Rectangle.app", hidden:false}'
+      when: rectangle_check.stat.exists
+      changed_when: false
+      failed_when: false
+
+    - name: Display Rectangle status
+      debug:
+        msg: "Rectangle {{ 'configured to launch at login' if rectangle_check.stat.exists else 'not found - install via Homebrew first' }}"
+
+- name: Configure Docker Desktop
+  tags: ['docker']
+  block:
+    - name: Check if Docker Desktop is installed
+      stat:
+        path: /Applications/Docker.app
+      register: docker_check
+
+    - name: Display Docker Desktop information
+      debug:
+        msg:
+          - "Docker Desktop {{ 'is installed' if docker_check.stat.exists else 'not found' }}"
+          - "{{ 'Start Docker Desktop from Applications folder' if docker_check.stat.exists else 'Install via Homebrew: brew install --cask docker' }}"
+
+- name: Configure Git credential helper
+  tags: ['git']
+  block:
+    - name: Ensure git credential helper is set to osxkeychain
+      git_config:
+        name: credential.helper
+        value: osxkeychain
+        scope: global
+
+- name: Display applications configuration summary
+  debug:
+    msg:
+      - "=========================================="
+      - "Applications Configuration Complete"
+      - "=========================================="
+      - "VS Code: {{ 'Configured with extensions and settings' if vscode_check.stat.exists else 'Not installed' }}"
+      - "iTerm2: {{ 'Configured' if iterm_check.stat.exists else 'Not installed' }}"
+      - "Rectangle: {{ 'Set to launch at login' if rectangle_check.stat.exists else 'Not installed' }}"
+      - "Docker: {{ 'Installed' if docker_check.stat.exists else 'Not installed' }}"
+      - "=========================================="
+  tags: ['always']

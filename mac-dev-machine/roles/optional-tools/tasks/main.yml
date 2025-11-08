@@ -1,0 +1,160 @@
+---
+# Optional Tools Role
+# Installs Xcode and iOS development tools (conditional)
+
+- name: Display Xcode installation notice
+  debug:
+    msg:
+      - "=========================================="
+      - "Installing Xcode and iOS Development Tools"
+      - "=========================================="
+      - "This may take a significant amount of time"
+      - "Xcode is a large download (~10-15GB)"
+      - "=========================================="
+  tags: ['xcode']
+
+- name: Check if Xcode is already installed
+  stat:
+    path: /Applications/Xcode.app
+  register: xcode_check
+  tags: ['xcode']
+
+- name: Install Xcode from App Store
+  tags: ['xcode']
+  block:
+    - name: Install mas (Mac App Store CLI) if not present
+      homebrew:
+        name: mas
+        state: present
+
+    - name: Check if signed into App Store
+      command: mas account
+      register: mas_account
+      changed_when: false
+      failed_when: false
+
+    - name: Display App Store login status
+      debug:
+        msg: "{{ 'Signed into App Store as: ' + mas_account.stdout if mas_account.rc == 0 else 'Not signed into App Store. Please sign in manually and run again.' }}"
+
+    - name: Install Xcode via mas
+      command: mas install 497799835
+      when:
+        - not xcode_check.stat.exists
+        - mas_account.rc == 0
+      register: xcode_install
+      changed_when: "'Installed' in xcode_install.stdout"
+      failed_when: false
+      async: 3600  # 1 hour timeout
+      poll: 30
+
+    - name: Display Xcode installation status
+      debug:
+        msg: "Xcode {{ 'installation complete' if xcode_install.changed else 'is already installed or installation failed' }}"
+      when: not xcode_check.stat.exists
+
+- name: Configure Xcode
+  tags: ['xcode']
+  block:
+    - name: Accept Xcode license
+      command: xcodebuild -license accept
+      become: yes
+      when: xcode_check.stat.exists or (xcode_install is defined and xcode_install.changed)
+      register: xcode_license
+      changed_when: false
+      failed_when: false
+
+    - name: Install Xcode Command Line Tools additional components
+      command: xcode-select --install
+      register: xcode_cli_install
+      changed_when: false
+      failed_when: false
+
+    - name: Set Xcode as active developer directory
+      command: xcode-select --switch /Applications/Xcode.app/Contents/Developer
+      become: yes
+      when: xcode_check.stat.exists or (xcode_install is defined and xcode_install.changed)
+      changed_when: false
+
+    - name: Run first launch to install additional components
+      command: xcodebuild -runFirstLaunch
+      become: yes
+      when: xcode_check.stat.exists or (xcode_install is defined and xcode_install.changed)
+      register: xcode_first_launch
+      changed_when: false
+      failed_when: false
+      async: 600
+      poll: 10
+
+- name: Install iOS development tools
+  tags: ['ios']
+  block:
+    - name: Install CocoaPods
+      command: gem install cocoapods
+      become: yes
+      register: cocoapods_install
+      changed_when: "'Successfully installed' in cocoapods_install.stdout"
+      failed_when: false
+
+    - name: Setup CocoaPods
+      command: pod setup
+      register: pod_setup
+      changed_when: false
+      failed_when: false
+
+    - name: Install fastlane
+      homebrew:
+        name: fastlane
+        state: present
+
+    - name: Display installed iOS development tools
+      debug:
+        msg:
+          - "iOS Development Tools Installed:"
+          - "  - CocoaPods: Installed"
+          - "  - fastlane: Installed"
+
+- name: List available simulators
+  command: xcrun simctl list devices available
+  register: simulators_list
+  changed_when: false
+  failed_when: false
+  tags: ['simulators']
+
+- name: Display available simulators
+  debug:
+    msg: "{{ simulators_list.stdout_lines }}"
+  when: simulators_list.rc == 0
+  tags: ['simulators']
+
+- name: Create iOS Simulator devices
+  command: xcrun simctl create "{{ item }}" "{{ item }}"
+  loop: "{{ ios_simulator_devices }}"
+  register: simulator_create
+  changed_when: "'Created' in simulator_create.stdout"
+  failed_when: false
+  tags: ['simulators']
+
+- name: Install additional simulator runtimes
+  debug:
+    msg:
+      - "To install additional iOS simulator runtimes, use:"
+      - "  xcodebuild -downloadPlatform iOS"
+      - "Or download from Xcode Preferences > Components"
+  tags: ['simulators']
+
+- name: Display Xcode configuration summary
+  debug:
+    msg:
+      - "=========================================="
+      - "Xcode & iOS Development Tools Setup Complete"
+      - "=========================================="
+      - "Xcode: {{ 'Installed and configured' if xcode_check.stat.exists or (xcode_install is defined and xcode_install.changed) else 'Installation may have failed' }}"
+      - "CocoaPods: Installed"
+      - "fastlane: Installed"
+      - "Simulators: Available (see list above)"
+      - "=========================================="
+      - "You can now open Xcode to complete any final setup steps"
+      - "Run 'xcodebuild -version' to verify installation"
+      - "=========================================="
+  tags: ['always']

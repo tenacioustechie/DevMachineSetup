@@ -1,0 +1,7 @@
+---
+# Default variables for homebrew role
+# These can be overridden in group_vars/all.yml
+
+homebrew_taps: []
+homebrew_packages: []
+homebrew_casks: []

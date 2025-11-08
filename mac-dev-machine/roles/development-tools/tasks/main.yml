@@ -1,0 +1,159 @@
+---
+# Development Tools Role
+# Installs and configures Node.js, .NET, Python, and other development tools
+
+- name: Configure fnm (Fast Node Manager)
+  tags: ['node', 'fnm']
+  block:
+    - name: Check if fnm is installed
+      command: which fnm
+      register: fnm_check
+      changed_when: false
+      failed_when: false
+
+    - name: Add fnm to shell configuration
+      lineinfile:
+        path: "{{ user_home }}/.zshrc"
+        line: 'eval "$(fnm env --use-on-cd)"'
+        create: yes
+        state: present
+      when: fnm_check.rc == 0
+
+    - name: Source fnm environment
+      shell: |
+        eval "$(fnm env --use-on-cd)"
+      args:
+        executable: /bin/zsh
+      when: fnm_check.rc == 0
+      changed_when: false
+
+    - name: Install Node.js via fnm
+      shell: |
+        eval "$(fnm env --use-on-cd)"
+        fnm install {{ node_version }}
+        fnm use {{ node_version }}
+        fnm default {{ node_version }}
+      args:
+        executable: /bin/zsh
+        creates: "{{ user_home }}/.local/share/fnm/node-versions/v{{ node_version }}"
+      when: fnm_check.rc == 0
+
+    - name: Verify Node.js installation
+      shell: |
+        eval "$(fnm env --use-on-cd)"
+        node --version
+      args:
+        executable: /bin/zsh
+      register: node_version_check
+      changed_when: false
+      failed_when: false
+
+    - name: Display Node.js version
+      debug:
+        msg: "Node.js version installed: {{ node_version_check.stdout }}"
+      when: node_version_check.rc == 0
+
+- name: Install global npm packages
+  shell: |
+    eval "$(fnm env --use-on-cd)"
+    npm install -g {{ item }}
+  args:
+    executable: /bin/zsh
+  loop: "{{ nodejs_global_packages }}"
+  register: npm_install
+  changed_when: "'up to date' not in npm_install.stdout"
+  tags: ['node', 'npm']
+
+- name: Install .NET SDK
+  tags: ['dotnet']
+  block:
+    - name: Add .NET tap
+      homebrew_tap:
+        name: isen-ng/dotnet-sdk-versions
+        state: present
+
+    - name: Check for .NET installation
+      command: dotnet --version
+      register: dotnet_check
+      changed_when: false
+      failed_when: false
+
+    - name: Install .NET SDK via Homebrew
+      homebrew_cask:
+        name: "dotnet-sdk{{ dotnet_sdk_version }}"
+        state: present
+      when: dotnet_check.rc != 0 or dotnet_sdk_version not in dotnet_check.stdout
+
+    - name: Verify .NET installation
+      command: dotnet --version
+      register: dotnet_version_output
+      changed_when: false
+
+    - name: Display .NET SDK version
+      debug:
+        msg: ".NET SDK version installed: {{ dotnet_version_output.stdout }}"
+
+- name: Configure Python
+  tags: ['python']
+  block:
+    - name: Set Python 3 as default python
+      file:
+        src: "{{ homebrew_prefix }}/bin/python3"
+        dest: "{{ homebrew_prefix }}/bin/python"
+        state: link
+      ignore_errors: yes
+
+    - name: Install pip packages
+      pip:
+        name:
+          - pipenv
+          - virtualenv
+          - black
+          - pylint
+        executable: pip3
+        state: present
+      ignore_errors: yes
+
+    - name: Verify Python installation
+      command: python3 --version
+      register: python_version_output
+      changed_when: false
+
+    - name: Display Python version
+      debug:
+        msg: "Python version installed: {{ python_version_output.stdout }}"
+
+- name: Configure Docker
+  tags: ['docker']
+  block:
+    - name: Check if Docker is running
+      command: docker info
+      register: docker_check
+      changed_when: false
+      failed_when: false
+
+    - name: Display Docker status
+      debug:
+        msg: "Docker is {{ 'running' if docker_check.rc == 0 else 'not running - you may need to start Docker Desktop manually' }}"
+
+- name: Configure Git LFS
+  tags: ['git']
+  block:
+    - name: Initialize Git LFS
+      command: git lfs install
+      register: git_lfs_init
+      changed_when: "'Updated' in git_lfs_init.stdout"
+      failed_when: false
+
+- name: Display development tools summary
+  debug:
+    msg:
+      - "=========================================="
+      - "Development Tools Installation Complete"
+      - "=========================================="
+      - "Node.js: {{ node_version_check.stdout | default('Not found') }}"
+      - ".NET SDK: {{ dotnet_version_output.stdout | default('Not found') }}"
+      - "Python: {{ python_version_output.stdout | default('Not found') }}"
+      - "Docker: {{ 'Running' if docker_check.rc == 0 else 'Not running' }}"
+      - "=========================================="
+  tags: ['always']

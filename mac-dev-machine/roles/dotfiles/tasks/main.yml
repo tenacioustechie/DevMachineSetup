@@ -1,0 +1,139 @@
+---
+# Dotfiles Role
+# Configures shell, git, and other dotfiles
+
+- name: Ensure .zshrc exists
+  file:
+    path: "{{ user_home }}/.zshrc"
+    state: touch
+    mode: '0644'
+  tags: ['shell']
+
+- name: Configure Zsh with custom settings
+  blockinfile:
+    path: "{{ user_home }}/.zshrc"
+    block: |
+      # === Mac Development Machine Setup ===
+
+      # Homebrew
+      eval "$({{ homebrew_prefix }}/bin/brew shellenv)"
+
+      # fnm (Fast Node Manager)
+      eval "$(fnm env --use-on-cd)"
+
+      # Aliases
+      alias ll='eza -la --git --icons'
+      alias ls='eza'
+      alias cat='bat'
+      alias tree='eza --tree'
+
+      # fzf (fuzzy finder)
+      [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+      # Custom PATH
+      export PATH="$HOME/.local/bin:$PATH"
+
+      # Editor
+      export EDITOR="code --wait"
+      export VISUAL="code --wait"
+
+      # Development
+      export NODE_OPTIONS="--max-old-space-size=4096"
+
+      # === End Mac Development Machine Setup ===
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - MAC DEV SETUP"
+    create: yes
+  tags: ['shell']
+
+- name: Install fzf key bindings
+  command: "{{ homebrew_prefix }}/opt/fzf/install --key-bindings --completion --no-update-rc"
+  args:
+    creates: "{{ user_home }}/.fzf.zsh"
+  tags: ['shell']
+
+- name: Configure Git user name
+  git_config:
+    name: user.name
+    value: "{{ git_user_name }}"
+    scope: global
+  when: git_user_name is defined and git_user_name != ""
+  tags: ['git']
+
+- name: Configure Git user email
+  git_config:
+    name: user.email
+    value: "{{ git_user_email }}"
+    scope: global
+  when: git_user_email is defined and git_user_email != ""
+  tags: ['git']
+
+- name: Configure Git default branch
+  git_config:
+    name: init.defaultBranch
+    value: "{{ git_default_branch }}"
+    scope: global
+  tags: ['git']
+
+- name: Configure Git settings
+  git_config:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    scope: global
+  loop:
+    - { name: 'core.editor', value: 'code --wait' }
+    - { name: 'pull.rebase', value: 'false' }
+    - { name: 'fetch.prune', value: 'true' }
+    - { name: 'core.autocrlf', value: 'input' }
+    - { name: 'color.ui', value: 'auto' }
+    - { name: 'credential.helper', value: 'osxkeychain' }
+  tags: ['git']
+
+- name: Create commonly used directories
+  file:
+    path: "{{ user_home }}/{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - Code
+    - Screenshots
+    - Projects
+  tags: ['directories']
+
+- name: Create .ssh directory with correct permissions
+  file:
+    path: "{{ user_home }}/.ssh"
+    state: directory
+    mode: '0700'
+  tags: ['ssh']
+
+- name: Create SSH config file
+  file:
+    path: "{{ user_home }}/.ssh/config"
+    state: touch
+    mode: '0600'
+  tags: ['ssh']
+
+- name: Add SSH config defaults
+  blockinfile:
+    path: "{{ user_home }}/.ssh/config"
+    block: |
+      # Default SSH settings
+      Host *
+        AddKeysToAgent yes
+        UseKeychain yes
+        IdentityFile ~/.ssh/id_ed25519
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    create: yes
+  tags: ['ssh']
+
+- name: Display dotfiles configuration summary
+  debug:
+    msg:
+      - "=========================================="
+      - "Dotfiles Configuration Complete"
+      - "=========================================="
+      - "Shell: zsh with custom aliases and functions"
+      - "Git configured: {{ 'Yes' if git_user_name != '' else 'Partial (set name/email in group_vars/all.yml)' }}"
+      - "SSH directory configured with proper permissions"
+      - "=========================================="
+  tags: ['always']

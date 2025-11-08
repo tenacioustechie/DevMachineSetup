@@ -1,0 +1,4 @@
+---
+# Default variables for applications role
+
+vscode_extensions: []

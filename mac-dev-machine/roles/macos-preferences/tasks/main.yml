@@ -1,0 +1,266 @@
+---
+# macOS Preferences Role
+# Configures system preferences using defaults command
+
+- name: Configure Dock preferences
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: 'autohide', type: 'bool', value: "{{ macos_preferences.dock.autohide }}" }
+    - { key: 'autohide-delay', type: 'float', value: "{{ macos_preferences.dock.autohide_delay }}" }
+    - { key: 'tilesize', type: 'int', value: "{{ macos_preferences.dock.tilesize }}" }
+    - { key: 'show-recents', type: 'bool', value: "{{ macos_preferences.dock.show_recents }}" }
+    - { key: 'minimize-to-application', type: 'bool', value: "{{ macos_preferences.dock.minimize_to_application }}" }
+  notify: restart dock
+  tags: ['dock']
+
+- name: Configure Finder preferences
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: 'AppleShowAllFiles', type: 'bool', value: "{{ macos_preferences.finder.show_hidden_files }}" }
+    - { key: 'AppleShowAllExtensions', type: 'bool', value: "{{ macos_preferences.finder.show_all_extensions }}" }
+    - { key: 'ShowPathbar', type: 'bool', value: "{{ macos_preferences.finder.show_path_bar }}" }
+    - { key: 'ShowStatusBar', type: 'bool', value: "{{ macos_preferences.finder.show_status_bar }}" }
+    - { key: 'FXPreferredViewStyle', type: 'string', value: "{{ macos_preferences.finder.default_view }}" }
+    - { key: 'FXEnableExtensionChangeWarning', type: 'bool', value: "{{ not macos_preferences.finder.disable_warning_on_change_extension }}" }
+  notify: restart finder
+  tags: ['finder']
+
+- name: Configure Finder to show path in title
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: _FXShowPosixPathInTitle
+    type: bool
+    value: true
+    state: present
+  notify: restart finder
+  tags: ['finder']
+
+- name: Set default Finder location to Home
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: NewWindowTarget
+    type: string
+    value: PfHm
+    state: present
+  notify: restart finder
+  tags: ['finder']
+
+- name: Configure screenshot location
+  block:
+    - name: Create screenshots directory
+      file:
+        path: "{{ macos_preferences.screenshots.location }}"
+        state: directory
+        mode: '0755'
+
+    - name: Set screenshot location
+      community.general.osx_defaults:
+        domain: com.apple.screencapture
+        key: location
+        type: string
+        value: "{{ macos_preferences.screenshots.location }}"
+        state: present
+
+    - name: Set screenshot format
+      community.general.osx_defaults:
+        domain: com.apple.screencapture
+        key: type
+        type: string
+        value: "{{ macos_preferences.screenshots.format }}"
+        state: present
+
+    - name: Configure screenshot shadow
+      community.general.osx_defaults:
+        domain: com.apple.screencapture
+        key: disable-shadow
+        type: bool
+        value: "{{ macos_preferences.screenshots.disable_shadow }}"
+        state: present
+  tags: ['screenshots']
+
+- name: Configure trackpad preferences
+  community.general.osx_defaults:
+    domain: com.apple.AppleMultitouchTrackpad
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: 'Clicking', type: 'bool', value: "{{ macos_preferences.trackpad.enable_tap_to_click }}" }
+  tags: ['trackpad']
+
+- name: Configure trackpad tap to click for login screen
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: com.apple.mouse.tapBehavior
+    type: int
+    value: 1
+    state: present
+  when: macos_preferences.trackpad.enable_tap_to_click
+  tags: ['trackpad']
+
+- name: Configure keyboard preferences
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: 'KeyRepeat', type: 'int', value: "{{ macos_preferences.keyboard.key_repeat_rate }}" }
+    - { key: 'InitialKeyRepeat', type: 'int', value: "{{ macos_preferences.keyboard.initial_key_repeat }}" }
+    - { key: 'NSAutomaticSpellingCorrectionEnabled', type: 'bool', value: "{{ not macos_preferences.keyboard.disable_auto_correct }}" }
+  tags: ['keyboard']
+
+- name: Disable auto-correct
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSAutomaticSpellingCorrectionEnabled
+    type: bool
+    value: false
+    state: present
+  when: macos_preferences.keyboard.disable_auto_correct
+  tags: ['keyboard']
+
+- name: Expand save panel by default
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSNavPanelExpandedStateForSaveMode
+    type: bool
+    value: true
+    state: present
+  tags: ['ui']
+
+- name: Expand print panel by default
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: PMPrintingExpandedStateForPrint
+    type: bool
+    value: true
+    state: present
+  tags: ['ui']
+
+- name: Save to disk (not iCloud) by default
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSDocumentSaveNewDocumentsToCloud
+    type: bool
+    value: false
+    state: present
+  tags: ['ui']
+
+- name: Disable the "Are you sure you want to open this application?" dialog
+  community.general.osx_defaults:
+    domain: com.apple.LaunchServices
+    key: LSQuarantine
+    type: bool
+    value: false
+    state: present
+  tags: ['security']
+
+- name: Require password immediately after sleep or screen saver
+  community.general.osx_defaults:
+    domain: com.apple.screensaver
+    key: askForPassword
+    type: int
+    value: 1
+    state: present
+  when: macos_preferences.security.require_password_immediately
+  tags: ['security']
+
+- name: Set screensaver delay
+  community.general.osx_defaults:
+    domain: com.apple.screensaver
+    key: askForPasswordDelay
+    type: int
+    value: 0
+    state: present
+  when: macos_preferences.security.require_password_immediately
+  tags: ['security']
+
+- name: Enable firewall
+  command: /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+  become: yes
+  register: firewall_result
+  changed_when: "'Firewall is enabled' not in firewall_result.stdout"
+  tags: ['security', 'firewall']
+
+- name: Configure menu bar to show battery percentage
+  community.general.osx_defaults:
+    domain: com.apple.menuextra.battery
+    key: ShowPercent
+    type: string
+    value: "YES"
+    state: present
+  tags: ['menubar']
+
+- name: Disable smart quotes
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSAutomaticQuoteSubstitutionEnabled
+    type: bool
+    value: false
+    state: present
+  tags: ['typing']
+
+- name: Disable smart dashes
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: NSAutomaticDashSubstitutionEnabled
+    type: bool
+    value: false
+    state: present
+  tags: ['typing']
+
+- name: Show all filename extensions in Finder
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleShowAllExtensions
+    type: bool
+    value: true
+    state: present
+  notify: restart finder
+  tags: ['finder']
+
+- name: Avoid creating .DS_Store files on network volumes
+  community.general.osx_defaults:
+    domain: com.apple.desktopservices
+    key: DSDontWriteNetworkStores
+    type: bool
+    value: true
+    state: present
+  tags: ['finder']
+
+- name: Avoid creating .DS_Store files on USB volumes
+  community.general.osx_defaults:
+    domain: com.apple.desktopservices
+    key: DSDontWriteUSBStores
+    type: bool
+    value: true
+    state: present
+  tags: ['finder']
+
+- name: Display preferences configuration summary
+  debug:
+    msg:
+      - "=========================================="
+      - "macOS Preferences Configuration Complete"
+      - "=========================================="
+      - "Dock: Autohide={{ macos_preferences.dock.autohide }}, Size={{ macos_preferences.dock.tilesize }}"
+      - "Finder: Hidden files={{ macos_preferences.finder.show_hidden_files }}, Extensions={{ macos_preferences.finder.show_all_extensions }}"
+      - "Screenshots: {{ macos_preferences.screenshots.location }}"
+      - "Security: Firewall enabled, Password required on wake"
+      - "=========================================="
+      - "Note: Some changes require logging out and back in"
+      - "=========================================="
+  tags: ['always']

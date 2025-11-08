@@ -1,0 +1,6 @@
+---
+# Default variables for development-tools role
+
+node_version: "20.15.0"
+dotnet_sdk_version: "8.0"
+nodejs_global_packages: []

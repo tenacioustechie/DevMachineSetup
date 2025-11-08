@@ -1,0 +1,14 @@
+---
+# Ansible Galaxy Requirements
+# External roles and collections needed for this playbook
+
+# Collections
+collections:
+  - name: community.general
+    version: ">=8.0.0"
+
+# Roles
+# Add external Ansible Galaxy roles here if needed in the future
+# roles:
+#   - name: geerlingguy.homebrew
+#     version: "4.2.0"

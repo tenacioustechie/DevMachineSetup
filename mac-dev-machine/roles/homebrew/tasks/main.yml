@@ -1,0 +1,74 @@
+---
+# Homebrew Role - Package Management
+# Installs and manages Homebrew packages and casks
+
+- name: Ensure Homebrew is up to date
+  homebrew:
+    update_homebrew: yes
+  tags: ['update']
+
+- name: Tap Homebrew repositories
+  homebrew_tap:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ homebrew_taps }}"
+  tags: ['taps']
+
+- name: Install Homebrew packages
+  homebrew:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ homebrew_packages }}"
+  tags: ['packages']
+
+- name: Install Homebrew casks
+  homebrew_cask:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ homebrew_casks }}"
+  tags: ['casks']
+  ignore_errors: yes  # Some casks may require manual interaction
+
+- name: Check if mas is installed
+  command: which mas
+  register: mas_check
+  changed_when: false
+  failed_when: false
+  when: mas_packages is defined
+  tags: ['mas']
+
+- name: Install mas (Mac App Store CLI)
+  homebrew:
+    name: mas
+    state: present
+  when:
+    - mas_packages is defined
+    - mas_check.rc != 0
+  tags: ['mas']
+
+- name: Install Mac App Store applications
+  command: "mas install {{ item.id }}"
+  loop: "{{ mas_packages }}"
+  when: mas_packages is defined
+  register: mas_install
+  changed_when: "'Installed' in mas_install.stdout"
+  failed_when: false
+  tags: ['mas']
+
+- name: Cleanup old Homebrew versions
+  command: brew cleanup
+  changed_when: false
+  tags: ['cleanup']
+
+- name: Run Homebrew diagnostics
+  command: brew doctor
+  register: brew_doctor
+  changed_when: false
+  failed_when: false
+  tags: ['diagnostics']
+
+- name: Display Homebrew diagnostics warnings
+  debug:
+    msg: "{{ brew_doctor.stdout_lines }}"
+  when: brew_doctor.rc != 0
+  tags: ['diagnostics']

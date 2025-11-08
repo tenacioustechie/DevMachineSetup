@@ -1,0 +1,86 @@
+---
+# Mac Development Machine Setup Playbook
+# This is the main orchestration file that runs all configuration roles
+
+- name: Configure Mac Development Machine
+  hosts: localhost
+  connection: local
+
+  vars_files:
+    - group_vars/all.yml
+
+  pre_tasks:
+    - name: Display setup information
+      debug:
+        msg:
+          - "=========================================="
+          - "Mac Development Machine Setup"
+          - "=========================================="
+          - "Hostname: {{ ansible_hostname }}"
+          - "macOS Version: {{ ansible_distribution_version }}"
+          - "Architecture: {{ ansible_architecture }}"
+          - "Install Xcode: {{ install_xcode | default(false) }}"
+          - "=========================================="
+      tags: always
+
+    - name: Check for Homebrew
+      stat:
+        path: "{{ homebrew_prefix }}/bin/brew"
+      register: homebrew_check
+      tags: always
+
+    - name: Fail if Homebrew is not installed
+      fail:
+        msg: "Homebrew is required but not found. Please run bootstrap.sh first."
+      when: not homebrew_check.stat.exists
+      tags: always
+
+  roles:
+    - role: homebrew
+      tags: ['homebrew', 'packages']
+
+    - role: development-tools
+      tags: ['development', 'tools']
+
+    - role: dotfiles
+      tags: ['dotfiles', 'shell']
+
+    - role: macos-preferences
+      tags: ['preferences', 'system']
+
+    - role: applications
+      tags: ['applications', 'config']
+
+    - role: optional-tools
+      when: install_xcode | default(false) | bool
+      tags: ['optional', 'xcode']
+
+  post_tasks:
+    - name: Display completion message
+      debug:
+        msg:
+          - "=========================================="
+          - "Setup Complete!"
+          - "=========================================="
+          - "Please restart your terminal to load new shell configurations"
+          - "You may need to log out and log back in for some system preferences to take effect"
+          - ""
+          - "Installed locations:"
+          - "  - Applications: /Applications and ~/Applications"
+          - "  - Homebrew packages: {{ homebrew_prefix }}"
+          - "  - Dotfiles: {{ ansible_env.HOME }}"
+          - "=========================================="
+      tags: always
+
+    - name: Check for pending system updates
+      command: softwareupdate -l
+      register: updates_check
+      changed_when: false
+      failed_when: false
+      tags: ['updates']
+
+    - name: Display update information
+      debug:
+        msg: "{{ updates_check.stdout_lines }}"
+      when: updates_check.stdout != ""
+      tags: ['updates']

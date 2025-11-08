@@ -1,0 +1,32 @@
+---
+# Ansible Inventory for Mac Development Machines
+# This file defines which machines to configure and their specific settings
+
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python3
+
+  vars:
+    # Global variables that apply to all hosts
+    ansible_become_method: sudo
+    ansible_become_ask_pass: true
+
+# Host groups for organizing multiple machines (future use)
+# You can create different groups for different machine types
+
+# Example for future multi-machine support:
+# personal_macs:
+#   hosts:
+#     personal-macbook:
+#       ansible_host: localhost
+#       install_xcode: true
+#       install_gaming_tools: true
+#
+# work_macs:
+#   hosts:
+#     work-macbook:
+#       ansible_host: localhost
+#       install_xcode: false
+#       install_work_vpn: true

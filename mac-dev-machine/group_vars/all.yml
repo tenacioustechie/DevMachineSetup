@@ -1,0 +1,195 @@
+---
+# Global Variables and Package Lists
+# Edit this file to customize your Mac development environment
+
+# Homebrew Configuration
+homebrew_prefix: "{{ '/opt/homebrew' if ansible_machine == 'arm64' else '/usr/local' }}"
+homebrew_install_path: "{{ homebrew_prefix }}"
+
+# User Configuration
+configure_user: "{{ ansible_user_id }}"
+user_home: "{{ ansible_env.HOME }}"
+
+# Homebrew Taps (additional package repositories)
+homebrew_taps:
+  - homebrew/cask
+  - homebrew/cask-fonts
+  - homebrew/cask-versions
+
+# Homebrew Packages (CLI tools)
+homebrew_packages:
+  # Version Control
+  - git
+  - git-lfs
+
+  # Core Development Tools
+  - wget
+  - curl
+  - jq
+  - tree
+  - htop
+
+  # Node.js Version Manager (fnm is faster than nvm)
+  - fnm
+
+  # Python
+  - python@3.11
+
+  # Database Tools
+  - postgresql@15
+
+  # Cloud & DevOps
+  - awscli
+  - terraform
+  - docker
+  - docker-compose
+
+  # Utilities
+  - ripgrep
+  - fzf
+  - bat
+  - eza  # Modern replacement for ls
+  - tldr  # Simplified man pages
+
+  # Compression
+  - unzip
+  - p7zip
+
+# Homebrew Casks (GUI Applications)
+homebrew_casks:
+  # Development IDEs & Editors
+  - visual-studio-code
+  - datagrip
+
+  # Terminals
+  - iterm2
+
+  # Browsers
+  - google-chrome
+  - firefox
+
+  # Communication
+  - slack
+  - zoom
+
+  # Utilities
+  - rectangle  # Window management (free)
+  - raycast    # Spotlight replacement with plugins
+  - maccy      # Clipboard manager
+
+  # Media
+  - spotify
+  - vlc
+
+  # Productivity
+  - notion
+  - obsidian
+
+  # Development Tools
+  - docker
+  - postman
+
+  # Fonts
+  - font-jetbrains-mono
+  - font-fira-code
+  - font-hack-nerd-font
+
+# Applications to install from Mac App Store (requires mas-cli)
+# Commented out by default - uncomment and add IDs if needed
+# mas_packages:
+#   - { id: 497799835, name: "Xcode" }  # Only if not using optional-tools role
+
+# Node.js Configuration
+node_version: "20.15.0"  # Match your Windows setup
+nodejs_global_packages:
+  - "@angular/cli"
+  - "typescript"
+  - "ts-node"
+  - "yarn"
+  - "pnpm"
+  - "npm-check-updates"
+
+# .NET Configuration
+dotnet_sdk_version: "8.0"  # Match your Windows setup
+
+# Git Configuration
+git_user_name: ""  # Set your name or leave empty to skip
+git_user_email: ""  # Set your email or leave empty to skip
+git_default_branch: "main"
+
+# macOS System Preferences
+macos_preferences:
+  # Dock Settings
+  dock:
+    autohide: true
+    autohide_delay: 0
+    tilesize: 48
+    show_recents: false
+    minimize_to_application: true
+
+  # Finder Settings
+  finder:
+    show_hidden_files: true
+    show_all_extensions: true
+    show_path_bar: true
+    show_status_bar: true
+    default_view: "Nlsv"  # List view
+    disable_warning_on_change_extension: true
+    disable_warning_on_empty_trash: false
+
+  # Screenshot Settings
+  screenshots:
+    location: "{{ user_home }}/Screenshots"
+    format: "png"
+    disable_shadow: false
+
+  # Trackpad Settings
+  trackpad:
+    enable_tap_to_click: true
+    enable_three_finger_drag: false
+
+  # Keyboard Settings
+  keyboard:
+    key_repeat_rate: 2
+    initial_key_repeat: 15
+    disable_auto_correct: false
+
+  # Energy Settings
+  energy:
+    display_sleep_time: 10  # minutes
+    disable_sleep_on_power_adapter: false
+
+  # Security & Privacy
+  security:
+    require_password_immediately: true
+    screensaver_delay: 5  # minutes
+
+# VS Code Extensions
+vscode_extensions:
+  - ms-vscode.csharp
+  - ms-dotnettools.csdevkit
+  - dbaeumer.vscode-eslint
+  - esbenp.prettier-vscode
+  - angular.ng-template
+  - ms-python.python
+  - ms-azuretools.vscode-docker
+  - eamodio.gitlens
+  - pkief.material-icon-theme
+  - github.copilot
+  - editorconfig.editorconfig
+  - bradlc.vscode-tailwindcss
+  - hashicorp.terraform
+
+# Optional Tools Configuration
+install_xcode: false  # Will be overridden by bootstrap.sh prompt
+xcode_version: "latest"
+
+# iOS Development
+ios_simulator_devices:
+  - "iPhone 15"
+  - "iPhone 15 Pro"
+  - "iPad Pro 12.9-inch"
+
+# Update Configuration
+auto_update_homebrew: true
+homebrew_update_frequency: "weekly"  # For reference only
