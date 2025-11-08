@@ -71,7 +71,7 @@ homebrew_casks:
   - firefox
 
   # Communication
-  - slack
+  #- slack
   - zoom
 
   # Utilities
@@ -172,9 +172,9 @@ vscode_extensions:
   - ms-dotnettools.csdevkit
   - dbaeumer.vscode-eslint
   - esbenp.prettier-vscode
-  - angular.ng-template
-  - ms-python.python
-  - ms-azuretools.vscode-docker
+  #- angular.ng-template
+  #- ms-python.python
+  #- ms-azuretools.vscode-docker
   - eamodio.gitlens
   - pkief.material-icon-theme
   - github.copilot
