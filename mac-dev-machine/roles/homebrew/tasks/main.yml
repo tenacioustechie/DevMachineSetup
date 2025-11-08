@@ -12,6 +12,12 @@
     name: "{{ item }}"
     state: present
   loop: "{{ homebrew_taps }}"
+  register: tap_result
+  failed_when:
+    - tap_result.failed is defined
+    - tap_result.failed
+    - "'already tapped' not in tap_result.msg | default('')"
+    - "'no longer typically necessary' not in tap_result.msg | default('')"
   tags: ['taps']
 
 - name: Install Homebrew packages

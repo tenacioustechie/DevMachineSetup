@@ -66,14 +66,27 @@ The Homebrew role establishes the foundation for package management on macOS. It
 
 ## Homebrew Taps (Repositories)
 
-Taps are third-party package repositories:
+**As of 2024, no additional taps are required!**
 
 ```yaml
-homebrew_taps:
-  - homebrew/cask           # GUI applications
-  - homebrew/cask-fonts     # Fonts
-  - homebrew/cask-versions  # Alternative versions of casks
+homebrew_taps: []
 ```
+
+### Deprecated Taps (No Longer Needed)
+
+All of the following taps have been deprecated and their contents migrated to the main Homebrew repository:
+
+| Tap | Deprecated | Now Available In |
+|-----|------------|------------------|
+| `homebrew/cask` | 2021 | Built into Homebrew core |
+| `homebrew/cask-fonts` | May 2024 | `homebrew/cask` |
+| `homebrew/cask-versions` | May 2024 | `homebrew/cask` (use `@version` suffix) |
+
+**What this means:**
+- ✅ Fonts install directly: `brew install --cask font-jetbrains-mono`
+- ✅ GUI apps install directly: `brew install --cask visual-studio-code`
+- ✅ Versioned apps use suffix: `brew install --cask firefox@developer-edition`
+- ❌ No tapping required anymore!
 
 ## Tasks Performed
 
@@ -94,18 +107,24 @@ brew update
 
 ### 2. Tap Repositories
 
-**What it does**: Adds custom package repositories
+**Status**: ⚠️ This step is now skipped (as of 2024)
 
-**Command**:
-```bash
-brew tap homebrew/cask
-brew tap homebrew/cask-fonts
-brew tap homebrew/cask-versions
+**What it does**: Would add custom package repositories if any were defined
+
+**Current configuration**: `homebrew_taps: []` (empty list)
+
+**Why empty**: As of May 2024, all common taps have been deprecated:
+- `homebrew/cask` - merged into core (2021)
+- `homebrew/cask-fonts` - merged into `homebrew/cask` (May 2024)
+- `homebrew/cask-versions` - merged into `homebrew/cask` (May 2024)
+
+**If you need custom taps**: Add third-party taps to the list in `group_vars/all.yml`:
+```yaml
+homebrew_taps:
+  - vendor/custom-tap
 ```
 
-**Why**: Enables access to additional packages not in main repository
-
-**Idempotent**: Yes - tapping an existing tap is a no-op
+**Error Handling**: The task has resilient error handling that ignores "already tapped" and "no longer necessary" errors
 
 ---
 

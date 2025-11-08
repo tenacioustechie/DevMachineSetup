@@ -11,10 +11,12 @@ configure_user: "{{ ansible_user_id }}"
 user_home: "{{ ansible_env.HOME }}"
 
 # Homebrew Taps (additional package repositories)
-homebrew_taps:
-  - homebrew/cask
-  - homebrew/cask-fonts
-  - homebrew/cask-versions
+# Note: As of 2024, the following taps have been deprecated and migrated to homebrew/cask:
+#   - homebrew/cask (integrated into core in 2021)
+#   - homebrew/cask-fonts (deprecated May 2024, fonts now in homebrew/cask)
+#   - homebrew/cask-versions (deprecated May 2024, versioned casks now use @version suffix)
+# All casks and fonts can now be installed directly without tapping additional repositories
+homebrew_taps: []
 
 # Homebrew Packages (CLI tools)
 homebrew_packages:
