@@ -27,7 +27,17 @@
       when: fnm_check.rc == 0
       changed_when: false
 
-    - name: Install Node.js via fnm
+    - name: Clean up any partial fnm downloads
+      shell: |
+        rm -rf {{ user_home }}/.local/share/fnm/node-versions/.downloads
+        rm -rf {{ user_home }}/.local/share/fnm/node-versions/v{{ node_version }}
+      args:
+        executable: /bin/zsh
+      when: fnm_check.rc == 0
+      failed_when: false
+      changed_when: false
+
+    - name: Install Node.js via fnm (with retry)
       shell: |
         eval "$(fnm env --use-on-cd)"
         fnm install {{ node_version }}
@@ -35,8 +45,12 @@
         fnm default {{ node_version }}
       args:
         executable: /bin/zsh
-        creates: "{{ user_home }}/.local/share/fnm/node-versions/v{{ node_version }}"
+        creates: "{{ user_home }}/.local/share/fnm/node-versions/v{{ node_version }}/bin/node"
       when: fnm_check.rc == 0
+      register: fnm_install_result
+      until: fnm_install_result.rc == 0
+      retries: 3
+      delay: 5
 
     - name: Verify Node.js installation
       shell: |

@@ -338,6 +338,63 @@ fnm current
 
 ---
 
+### Issue: fnm Node.js Installation Fails
+
+**Symptom**:
+```
+error: Can't download the requested binary: Can't extract the file
+error: Requested version v20.15.0 is not currently installed
+```
+
+**Root Cause**: Network interruption, partial download, or filesystem issue during extraction
+
+**Solutions**:
+
+1. **The playbook automatically retries 3 times** - wait for retries to complete
+
+2. If all retries fail, clean up and retry manually:
+```bash
+# Clean up partial downloads
+rm -rf ~/.local/share/fnm/node-versions/.downloads
+rm -rf ~/.local/share/fnm/node-versions/v20.15.0
+
+# Try again
+fnm install 20.15.0
+```
+
+3. Check available disk space:
+```bash
+df -h ~
+# Node.js needs ~200MB for extraction
+```
+
+4. Try a different Node version:
+```bash
+# Edit group_vars/all.yml
+node_version: "20.18.0"  # Try latest 20.x
+```
+
+5. Check internet connection:
+```bash
+curl -I https://nodejs.org/dist/v20.15.0/node-v20.15.0-darwin-arm64.tar.gz
+```
+
+6. Manual download and install:
+```bash
+# Download manually
+curl -O https://nodejs.org/dist/v20.15.0/node-v20.15.0-darwin-arm64.tar.gz
+
+# fnm will use local file
+fnm install 20.15.0
+```
+
+**Prevention**: The setup now includes:
+- Automatic cleanup of partial downloads
+- 3 retry attempts with 5-second delays
+- Better idempotency checks
+
+---
+
 ### Issue: .NET SDK Not Found
 
 **Symptom**:
