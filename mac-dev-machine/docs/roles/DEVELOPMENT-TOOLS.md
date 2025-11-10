@@ -388,7 +388,7 @@ nodejs_global_packages:
 Edit `group_vars/all.yml`:
 
 ```yaml
-dotnet_sdk_version: "7.0"  # Change to desired version
+dotnet_sdk_version: "8"  # Change to desired version
 ```
 
 Available versions: Check `brew search dotnet`

@@ -112,7 +112,7 @@ nodejs_global_packages:
   - "npm-check-updates"
 
 # .NET Configuration
-dotnet_sdk_version: "8.0"  # Match your Windows setup
+dotnet_sdk_version: "8"  # Match your Windows setup
 
 # Git Configuration
 git_user_name: ""  # Set your name or leave empty to skip
