@@ -94,7 +94,7 @@
 
     - name: Install .NET SDK via Homebrew
       homebrew_cask:
-        name: "dotnet-sdk{{ dotnet_sdk_version }}"
+        name: "dotnet-sdk@{{ dotnet_sdk_version }}"
         state: present
       when: dotnet_check.rc != 0 or dotnet_sdk_version not in dotnet_check.stdout
 

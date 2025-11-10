@@ -145,7 +145,7 @@ Find versions: https://nodejs.org/en/download/releases/
 ### .NET SDK Version
 
 ```yaml
-dotnet_sdk_version: "7.0"  # Change to 7.0 or 6.0
+dotnet_sdk_version: "8"  # Change to 9 or whatever version prefered
 ```
 
 Check available: `brew search dotnet-sdk`
