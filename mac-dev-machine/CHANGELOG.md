@@ -15,9 +15,8 @@ The .NET SDK cask uses a `.pkg` installer that requires sudo privileges to insta
 
 ### Changes Made
 
-1. **Added `become: yes`** to the .NET SDK installation task
-2. **Added `sudo_password` parameter** to pass Ansible's become password to Homebrew
-3. **Updated .NET SDK version format** in `group_vars/all.yml` from `"8.0"` to `"8"` to match Homebrew cask naming
+1. **Added `become: yes`** to the .NET SDK installation task to enable privilege escalation
+2. **Updated .NET SDK version format** in `group_vars/all.yml` from `"8.0"` to `"8"` to match Homebrew cask naming (`dotnet-sdk@8`)
 
 ### Code Changes
 
@@ -35,7 +34,6 @@ The .NET SDK cask uses a `.pkg` installer that requires sudo privileges to insta
   homebrew_cask:
     name: "dotnet-sdk@{{ dotnet_sdk_version }}"
     state: present
-    sudo_password: "{{ ansible_become_password }}"
   become: yes
 ```
 
@@ -90,11 +88,11 @@ ansible-playbook -i inventory.yml playbook.yml --ask-become-pass
 
 Ansible's `become` mechanism:
 - `--ask-become-pass`: Prompts for sudo password once at start
-- `ansible_become_password`: Stores password for reuse
+- `ansible_become_password`: Stores password for session reuse
 - `become: yes`: Enables privilege escalation for specific task
-- `sudo_password` parameter: Passes password to Homebrew's internal sudo calls
+- Ansible automatically handles sudo authentication when `become: yes` is set
 
-The fix ensures Homebrew's internal `sudo` commands have access to the password without prompting.
+The fix enables privilege escalation for the .NET SDK installation task, allowing Ansible to handle the sudo requirements automatically.
 
 ---
 

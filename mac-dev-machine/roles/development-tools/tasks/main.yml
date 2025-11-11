@@ -96,7 +96,6 @@
       homebrew_cask:
         name: "dotnet-sdk@{{ dotnet_sdk_version }}"
         state: present
-        sudo_password: "{{ ansible_become_password }}"
       become: yes
       when: dotnet_check.rc != 0 or dotnet_sdk_version not in dotnet_check.stdout
 
