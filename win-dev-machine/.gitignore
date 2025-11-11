@@ -1,0 +1,13 @@
+# User-specific configuration file
+config.ps1
+
+# Backup files
+*.backup
+*.bak
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
