@@ -1,5 +1,103 @@
 # Changelog
 
+## 2025-11-08 - Fix .NET SDK Installation (Sudo Password Issue)
+
+### Issue
+.NET SDK installation via Homebrew cask was failing with sudo password error:
+
+```
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+Error: Failure while executing; `/usr/bin/sudo -u root -E ... /usr/sbin/installer -pkg ... -target /` exited with 1
+```
+
+### Root Cause
+The .NET SDK cask uses a `.pkg` installer that requires sudo privileges to install to system directories. The Ansible `homebrew_cask` module was not properly configured to use the sudo password provided via `--ask-become-pass`.
+
+### Changes Made
+
+1. **Added `become: yes`** to the .NET SDK installation task
+2. **Added `sudo_password` parameter** to pass Ansible's become password to Homebrew
+3. **Updated .NET SDK version format** in `group_vars/all.yml` from `"8.0"` to `"8"` to match Homebrew cask naming
+
+### Code Changes
+
+**Before**:
+```yaml
+- name: Install .NET SDK via Homebrew
+  homebrew_cask:
+    name: "dotnet-sdk@{{ dotnet_sdk_version }}"
+    state: present
+```
+
+**After**:
+```yaml
+- name: Install .NET SDK via Homebrew
+  homebrew_cask:
+    name: "dotnet-sdk@{{ dotnet_sdk_version }}"
+    state: present
+    sudo_password: "{{ ansible_become_password }}"
+  become: yes
+```
+
+### Configuration Update
+
+**In `group_vars/all.yml`**:
+```yaml
+# Before
+dotnet_sdk_version: "8.0"
+
+# After
+dotnet_sdk_version: "8"  # Matches Homebrew cask name: dotnet-sdk@8
+```
+
+### Why This Happens
+
+The .NET SDK installer:
+1. Installs to `/usr/local/share/dotnet` (system directory)
+2. Creates symlinks in `/usr/local/bin`
+3. Modifies system PATH
+4. Requires root privileges for all these operations
+
+Other casks that drop `.app` files to `/Applications` don't need sudo, but installer packages (`.pkg`) always do.
+
+### Files Changed
+- `roles/development-tools/tasks/main.yml` - Added become and sudo_password
+- `group_vars/all.yml` - Updated dotnet_sdk_version format (user made this change)
+
+### Testing
+After this fix:
+- ✅ .NET SDK installs successfully with provided sudo password
+- ✅ No interactive password prompts
+- ✅ Installation completes non-interactively
+- ✅ Works with `--ask-become-pass` flag
+
+### For Users
+
+**No action needed** - the fix is already applied. The bootstrap script already includes `--ask-become-pass`:
+
+```bash
+./bootstrap.sh
+# Prompts for password once at the start
+# Password is reused for .NET SDK installation
+```
+
+**If running playbook directly**, ensure you use:
+```bash
+ansible-playbook -i inventory.yml playbook.yml --ask-become-pass
+```
+
+### Background
+
+Ansible's `become` mechanism:
+- `--ask-become-pass`: Prompts for sudo password once at start
+- `ansible_become_password`: Stores password for reuse
+- `become: yes`: Enables privilege escalation for specific task
+- `sudo_password` parameter: Passes password to Homebrew's internal sudo calls
+
+The fix ensures Homebrew's internal `sudo` commands have access to the password without prompting.
+
+---
+
 ## 2025-11-08 - Fix fnm Node.js Installation Failures
 
 ### Issue
