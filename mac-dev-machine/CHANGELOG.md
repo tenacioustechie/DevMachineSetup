@@ -1,5 +1,158 @@
 # Changelog
 
+## 2025-11-11 - Convert from Ansible to Shell Scripts
+
+### Major Architecture Change
+
+Converted the entire Mac setup from Ansible-based automation to a simple shell script approach, similar to the Windows PowerShell setup in this repository.
+
+### Reasons for Change
+
+The Ansible approach encountered a fundamental architectural problem:
+- .NET SDK `.pkg` installer requires root privileges
+- Homebrew refuses to run as root (security policy)
+- Ansible's `become: yes` runs Homebrew as root, causing conflicts
+- This created an unsolvable catch-22 with the Ansible approach
+
+Additional reasons for the conversion:
+1. **Simpler**: No Ansible installation or learning curve required
+2. **Faster**: No framework overhead, direct execution
+3. **More Reliable**: Avoids privilege escalation conflicts
+4. **Easier to Debug**: Plain bash is easier to understand and troubleshoot
+5. **Consistent**: Matches the Windows PowerShell approach in this repository
+6. **No Dependencies**: Just bash, which is already on macOS
+
+### New Structure
+
+**Files Created**:
+- `setup.sh` - Main orchestration script (replaces `bootstrap.sh` and `playbook.yml`)
+- `config.sh` - Configuration file (replaces `group_vars/all.yml`)
+
+**Files Made Obsolete** (kept for reference):
+- `bootstrap.sh` - Replaced by `setup.sh`
+- `playbook.yml` - No longer needed
+- `inventory.yml` - No longer needed
+- `requirements.yml` - No longer needed
+- `roles/` directory - Logic moved into `setup.sh`
+- `group_vars/all.yml` - Replaced by `config.sh`
+
+### What Changed
+
+**Configuration Format**:
+```bash
+# Before (YAML)
+homebrew_packages:
+  - git
+  - wget
+
+# After (Bash)
+HOMEBREW_PACKAGES=(
+    "git"
+    "wget"
+)
+```
+
+**Execution**:
+```bash
+# Before
+./bootstrap.sh
+# (Installs Ansible, then runs playbook)
+
+# After
+./setup.sh
+# (Direct execution, no dependencies)
+```
+
+**Error Handling**:
+- Shell script includes retry logic for fnm Node.js installation (3 attempts)
+- Better error messages with colored output
+- Continues on warnings, stops on critical errors
+
+### New Features
+
+1. **Command Line Options**:
+   - `./setup.sh --skip-xcode` - Skip Xcode installation prompt
+   - `./setup.sh --config path/to/config.sh` - Use custom configuration file
+
+2. **Colored Output**:
+   - Blue for info messages
+   - Green for success messages
+   - Yellow for warnings
+   - Red for errors
+
+3. **Progress Indicators**:
+   - Clear section headers
+   - Detailed logging of what's being installed
+   - Already-installed items marked with ✓
+
+4. **Better Idempotency**:
+   - Checks for existing installations before attempting install
+   - Skips already-installed packages
+   - Safe to run multiple times
+
+### Migration Guide
+
+**For New Users**:
+Just use the new setup:
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+**For Existing Users**:
+If you customized `group_vars/all.yml`, migrate your settings to `config.sh`:
+
+1. **Package Lists**: Copy your customized packages from `group_vars/all.yml` to `config.sh`
+2. **Git Settings**: Copy `git_user_name` and `git_user_email` to `config.sh`
+3. **System Preferences**: Copy your macOS preference values to `config.sh`
+4. **Node/Tools Versions**: Copy version numbers to `config.sh`
+
+### Testing
+
+The new shell script setup has been tested with:
+- ✅ Homebrew installation and package management
+- ✅ fnm Node.js installation with retry logic
+- ✅ .NET SDK installation (properly prompts for password, no root conflicts)
+- ✅ Shell configuration and dotfiles
+- ✅ macOS preferences configuration
+- ✅ VS Code extension installation
+- ✅ Idempotent execution (safe to run multiple times)
+
+### Documentation Updates
+
+- Updated `README.md` to reflect shell script approach
+- Kept existing docs in `docs/` directory (still relevant, just different execution method)
+- Updated directory structure documentation
+- Added comparison section explaining the change
+
+### Breaking Changes
+
+- **Ansible no longer required or used**
+- **Old bootstrap.sh and playbook.yml obsolete** (kept for reference)
+- **Configuration format changed from YAML to Bash variables**
+
+### Benefits
+
+1. **No .NET SDK Installation Issues**: Homebrew prompts for password when needed, doesn't run as root
+2. **Faster Setup**: No Ansible installation step
+3. **Easier to Customize**: Direct bash variables instead of YAML
+4. **Better Debugging**: Can run individual sections, add `set -x` for debugging
+5. **More Maintainable**: Simpler codebase, easier to understand
+
+### For Contributors
+
+The new architecture is much simpler:
+- All logic in `setup.sh` (well-commented functions)
+- All configuration in `config.sh` (just bash variables)
+- No role structure or YAML processing needed
+
+To add new functionality:
+1. Add a function to `setup.sh`
+2. Add any config variables to `config.sh`
+3. Call the function from `main()`
+
+---
+
 ## 2025-11-08 - Fix .NET SDK Installation (Sudo Password Issue)
 
 ### Issue
