@@ -61,9 +61,12 @@ Automated setup for macOS development environments using shell scripts. This set
    cd DevMachineSetup/mac-dev-machine
    ```
 
-2. **Customize your setup** (optional but recommended):
+2. **Create your personal configuration file**:
    ```bash
-   # Edit the configuration file
+   # Copy the example configuration
+   cp config.example.sh config.sh
+
+   # Edit with your personal settings
    nano config.sh
    # or
    code config.sh
@@ -93,7 +96,8 @@ Automated setup for macOS development environments using shell scripts. This set
 ```
 mac-dev-machine/
 ├── setup.sh              # Main setup script
-├── config.sh             # Configuration file (EDIT THIS)
+├── config.example.sh     # Example configuration (committed to repo)
+├── config.sh             # Your personal configuration (gitignored - EDIT THIS)
 ├── README.md             # This file
 ├── CHANGELOG.md          # Version history and fixes
 └── docs/                 # Detailed documentation
@@ -105,7 +109,14 @@ mac-dev-machine/
 
 ## Customization
 
-All customization is done in [config.sh](config.sh). This file contains:
+All customization is done in [config.sh](config.sh).
+
+**Important**: The `config.sh` file is gitignored and won't be committed. Create it from the example:
+```bash
+cp config.example.sh config.sh
+```
+
+This file contains:
 
 ### Adding or Removing Software
 
@@ -262,11 +273,13 @@ For more troubleshooting help, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTIN
 To set up a new Mac with your existing configuration:
 
 1. **On your old Mac**:
-   - Commit any custom changes to [config.sh](config.sh)
-   - Push changes to your repository
+   - Keep a copy of your `config.sh` file (save it elsewhere or remember your settings)
+   - Note: `config.sh` is gitignored, so it won't be in the repository
 
 2. **On your new Mac**:
    - Clone the repository
+   - Create your config: `cp config.example.sh config.sh`
+   - Edit `config.sh` with your personal settings (or copy from your old Mac)
    - Run `./setup.sh`
    - Manually migrate:
      - SSH keys from `~/.ssh/`
@@ -299,12 +312,10 @@ This setup uses a straightforward shell script approach:
    - Applies macOS preferences
    - Configures applications
 
-2. **config.sh** - Configuration file containing:
-   - Package lists (Homebrew formulae and casks)
-   - Development tool versions
-   - System preference settings
-   - Git configuration
-   - VS Code extensions
+2. **config.sh** / **config.example.sh** - Configuration files:
+   - `config.example.sh` - Example configuration (committed to repo)
+   - `config.sh` - Your personal configuration (gitignored)
+   - Contains package lists, tool versions, preferences, Git config, and VS Code extensions
 
 This approach is:
 - **Simple**: No framework overhead, just bash
@@ -374,7 +385,8 @@ fnm use 18.18.0
 - VS Code settings: `~/Library/Application Support/Code/User/`
 - Shell config: `~/.zshrc`
 - Git config: `~/.gitconfig`
-- Configuration: `./config.sh`
+- Personal configuration: `./config.sh` (gitignored)
+- Example configuration: `./config.example.sh` (in repo)
 
 ### Next Steps After Setup
 

@@ -396,6 +396,31 @@ setup_git_config() {
     git config --global core.autocrlf input
     git config --global core.editor "code --wait" 2>/dev/null || true
 
+    # Configure Kdiff3 as merge and diff tool (if installed)
+    if command_exists kdiff3; then
+        log_info "Configuring Kdiff3 as Git merge and diff tool..."
+
+        # Set kdiff3 as the merge tool
+        git config --global merge.tool kdiff3
+        git config --global mergetool.kdiff3.path "$(command -v kdiff3)"
+        git config --global mergetool.kdiff3.trustExitCode false
+        git config --global mergetool.keepBackup false
+
+        # Set kdiff3 as the diff tool
+        git config --global diff.tool kdiff3
+        git config --global difftool.kdiff3.path "$(command -v kdiff3)"
+        git config --global difftool.kdiff3.trustExitCode false
+
+        # Don't prompt before opening kdiff3
+        git config --global difftool.prompt false
+        git config --global mergetool.prompt false
+
+        log_success "Kdiff3 configured as Git merge/diff tool"
+    else
+        log_info "Kdiff3 not installed, skipping Git merge/diff tool configuration"
+        log_info "Kdiff3 will be configured on next setup run after installation"
+    fi
+
     log_success "Git configuration complete"
 }
 
@@ -405,6 +430,12 @@ setup_git_config() {
 
 setup_macos_preferences() {
     log_section "macOS Preferences"
+
+    # Set timezone if configured
+    if [[ -n "${TIMEZONE:-}" ]]; then
+        log_info "Setting system timezone to: $TIMEZONE"
+        sudo systemsetup -settimezone "$TIMEZONE" 2>/dev/null || log_warning "Failed to set timezone (may require manual configuration)"
+    fi
 
     log_info "Configuring Dock preferences..."
 
@@ -526,6 +557,16 @@ main() {
     # Load configuration
     if [[ ! -f "$CONFIG_FILE" ]]; then
         log_error "Configuration file not found: $CONFIG_FILE"
+        echo ""
+        log_info "This appears to be your first time running the setup."
+        log_info "Please create your personal configuration file:"
+        echo ""
+        echo "  cd $SCRIPT_DIR"
+        echo "  cp config.example.sh config.sh"
+        echo ""
+        log_info "Then edit config.sh with your personal settings (name, email, etc.)"
+        log_info "The config.sh file is gitignored and won't be committed to the repository."
+        echo ""
         exit 1
     fi
 
