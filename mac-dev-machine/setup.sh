@@ -115,6 +115,68 @@ retry_command() {
 }
 
 ################################################################################
+# Configuration Validation
+################################################################################
+
+validate_config() {
+    log_section "Configuration Validation"
+
+    local config_warnings=0
+
+    # Define expected variables (add new ones here as the config evolves)
+    local expected_vars=(
+        "NODE_VERSION"
+        "DOTNET_SDK_VERSION"
+        "GIT_DEFAULT_BRANCH"
+        "TIMEZONE"
+        "NODEJS_GLOBAL_PACKAGES"
+        "HOMEBREW_PACKAGES"
+        "HOMEBREW_CASKS"
+        "VSCODE_EXTENSIONS"
+        "MACOS_DOCK_AUTOHIDE"
+        "MACOS_FINDER_SHOW_HIDDEN"
+        "INSTALL_XCODE"
+    )
+
+    log_info "Checking configuration completeness..."
+
+    # Check for missing variables
+    for var in "${expected_vars[@]}"; do
+        if [[ -z "${!var+x}" ]]; then
+            log_warning "Config variable '$var' is not defined in your config.sh"
+            config_warnings=$((config_warnings + 1))
+        fi
+    done
+
+    # Check if config.sh is older than config.example.sh
+    if [[ -f "${SCRIPT_DIR}/config.example.sh" ]] && [[ -f "$CONFIG_FILE" ]]; then
+        if [[ "${SCRIPT_DIR}/config.example.sh" -nt "$CONFIG_FILE" ]]; then
+            log_warning "config.example.sh has been updated since your config.sh was last modified"
+            log_info "Consider reviewing config.example.sh for new configuration options"
+            config_warnings=$((config_warnings + 1))
+        fi
+    fi
+
+    if [[ $config_warnings -gt 0 ]]; then
+        echo ""
+        log_warning "Found $config_warnings configuration warning(s)"
+        log_info "Your setup will continue, but you may want to update your config.sh"
+        log_info "Compare with: diff $CONFIG_FILE ${SCRIPT_DIR}/config.example.sh"
+        echo ""
+
+        # Give user a chance to cancel
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Setup cancelled. Please update your config.sh and try again."
+            exit 0
+        fi
+    else
+        log_success "Configuration validation passed"
+    fi
+}
+
+################################################################################
 # Pre-flight Checks
 ################################################################################
 
@@ -572,6 +634,9 @@ main() {
 
     log_info "Loading configuration from: $CONFIG_FILE"
     source "$CONFIG_FILE"
+
+    # Validate configuration
+    validate_config
 
     # Run setup steps
     preflight_checks

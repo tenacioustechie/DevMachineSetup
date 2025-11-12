@@ -218,6 +218,11 @@ INSTALL_XCODE=false  # Set to true to install Xcode from Mac App Store
 # This allows you to maintain personal settings across multiple machines
 # without accidentally committing them.
 #
+# Configuration Updates:
+# The setup script validates your config.sh against this example file and will
+# warn you if new configuration options have been added. You can compare files
+# using: diff config.sh config.example.sh
+#
 # Package Names:
 # - Find Homebrew packages: https://formulae.brew.sh/
 # - Find casks: https://formulae.brew.sh/cask/
