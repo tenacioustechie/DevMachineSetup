@@ -1,14 +1,43 @@
-# Overview
+# Development Machine Setup
 
-This script sets up my windows development machine using winget. It was initially used in Windows 11.
+Automated setup scripts for Windows and macOS development environments.
 
-# To do
+## What's Included
+
+- **Windows Setup** (root directory) - PowerShell scripts using winget for Windows 11
+- **macOS Setup** ([`mac-dev-machine/`](mac-dev-machine/)) - Shell scripts for automated Mac development environment
+- **Ansible Setup** ([`ansible-dev-setup/`](ansible-dev-setup/)) - Archived Ansible-based Mac setup (reference only)
+
+## Quick Start
+
+### Windows Setup
+
+This script sets up Windows development machines using winget. Initially used in Windows 11.
+
+### macOS Setup
+
+Automated macOS development environment setup using shell scripts.
+
+```bash
+cd mac-dev-machine
+cp config.example.sh config.sh
+# Edit config.sh with your personal settings
+./setup.sh
+```
+
+See [`mac-dev-machine/readme.md`](mac-dev-machine/readme.md) for full documentation.
+
+---
+
+## Windows Setup - Detailed Instructions
+
+### To Do
 
 - script dev drive creation for node_modules global cache + set global environment variable for it
 - script dev drive creation for nuget package cache + set global environment variable for it
 - script dev drive creation for c:\code directory mount point
 
-# Quick Start - Machine Setup
+### Machine Setup
 
 Run these scripts on a new machine in powershell. Note: use a user powershell prompt, unless the script explicitly requires it (the scripts detect if they need admin and will imediatly error if not run with elevated admin permissions).
 

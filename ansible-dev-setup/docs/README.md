@@ -1,6 +1,10 @@
-# Mac Development Machine Setup - Documentation
+# Mac Development Machine Setup - Ansible Documentation (Archived)
 
-Comprehensive documentation for understanding, using, and customizing the Mac development machine automation setup.
+> **⚠️ ARCHIVED**: This documentation is for the archived Ansible-based setup.
+>
+> **Please use the shell script version in [`../../mac-dev-machine/`](../../mac-dev-machine/) instead.**
+
+Comprehensive documentation for understanding, using, and customizing the Ansible-based Mac development machine automation setup (archived for reference).
 
 ## Quick Links
 
