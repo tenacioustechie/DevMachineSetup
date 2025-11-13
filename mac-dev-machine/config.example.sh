@@ -198,6 +198,7 @@ MACOS_TRACKPAD_TAP_TO_CLICK=true
 # Keyboard Settings
 MACOS_KEYBOARD_KEY_REPEAT=2         # Lower = faster (requires logout)
 MACOS_KEYBOARD_INITIAL_REPEAT=15    # Lower = shorter delay (requires logout)
+MACOS_KEYBOARD_FNKEYS_STANDARD=true # Use F1-F12 as standard function keys (not special features)
 
 ################################################################################
 # Optional Tools Configuration

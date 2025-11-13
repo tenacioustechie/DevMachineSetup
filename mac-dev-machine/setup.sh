@@ -539,6 +539,12 @@ setup_macos_preferences() {
     defaults write NSGlobalDomain KeyRepeat -int "${MACOS_KEYBOARD_KEY_REPEAT:-2}"
     defaults write NSGlobalDomain InitialKeyRepeat -int "${MACOS_KEYBOARD_INITIAL_REPEAT:-15}"
 
+    # Function keys mode (true = F1-F12 work as standard function keys)
+    if [[ "${MACOS_KEYBOARD_FNKEYS_STANDARD:-false}" == true ]]; then
+        defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
+        log_info "F1-F12 keys set to standard function mode"
+    fi
+
     log_info "Restarting affected applications..."
     killall Dock 2>/dev/null || true
     killall Finder 2>/dev/null || true
