@@ -122,6 +122,7 @@ HOMEBREW_CASKS=(
     "microsoft-teams"  # Commented out - uncomment if needed
 
     # Utilities
+    "alt-tab"     # Window switcher (free)
     "rectangle"   # Window management (free)
     "raycast"     # Spotlight replacement with plugins
     "maccy"       # Clipboard manager
