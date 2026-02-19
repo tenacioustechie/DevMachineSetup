@@ -223,7 +223,7 @@ if (-not ($Elevated -or $UserPhase)) {
     if ($SkipWSL) { $arguments += " -SkipWSL" }
     if ($Config -ne ".\config.ps1") { $arguments += " -Config `"$Config`"" }
 
-    Start-Process pwsh -Verb RunAs -ArgumentList $arguments
+    Start-Process powershell -Verb RunAs -ArgumentList $arguments
     exit
 }
 
@@ -260,7 +260,8 @@ if ($Elevated) {
 
     Write-Section "Pre-flight Checks"
 
-    Write-Info "Windows Version: $(( Get-CimInstance Win32_OperatingSystem).Caption)"
+    $osCaption = (Get-CimInstance Win32_OperatingSystem).Caption
+    Write-Info "Windows Version: $osCaption"
     Write-Info "PowerShell Version: $($PSVersionTable.PSVersion)"
     Write-Info "Architecture: $env:PROCESSOR_ARCHITECTURE"
 
@@ -571,7 +572,7 @@ if ($Elevated) {
     $shell = New-Object -ComObject "Shell.Application"
     $arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -UserPhase -Config `"$Config`""
     if ($SkipWSL) { $arguments += " -SkipWSL" }
-    $shell.ShellExecute("pwsh.exe", $arguments, "", "open", 1)
+    $shell.ShellExecute("powershell.exe", $arguments, "", "open", 1)
 
     exit
 }
