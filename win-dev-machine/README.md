@@ -18,11 +18,37 @@ Automated setup for Windows 11 development environments using PowerShell. Design
 - Administrator access
 - Internet connection
 
+## First Run on a Fresh Machine
+
+On a brand new Windows machine, you won't have Git installed yet. Open PowerShell and run
+these commands to install Git via winget, clone this repository, and start the setup:
+
+```powershell
+# 1. Install Git using winget (built into Windows 10/11)
+winget install --id Git.Git --exact --source winget --silent --accept-source-agreements --accept-package-agreements
+
+# 2. Refresh your PATH so git is available immediately
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+# 3. Clone the repository
+git clone https://github.com/YourOrg/DevMachineSetup.git
+cd DevMachineSetup\win-dev-machine
+
+# 4. Create your configuration file and edit it
+Copy-Item config.example.ps1 config.ps1
+notepad config.ps1
+
+# 5. Run the setup
+.\setup.ps1
+```
+
 ## Quick Start
+
+If you already have Git installed:
 
 1. **Clone this repository**:
    ```powershell
-   git clone <repository-url>
+   git clone https://github.com/YourOrg/DevMachineSetup.git
    cd DevMachineSetup\win-dev-machine
    ```
 
