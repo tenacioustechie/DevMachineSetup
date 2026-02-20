@@ -217,11 +217,13 @@ if (-not ($Elevated -or $UserPhase)) {
     Write-Section "Windows Development Machine Setup"
     Write-Info "Starting setup process..."
     Write-Info "Launching Phase 1 (Admin) with elevation..."
+    Write-Info "Script path $PSCommandPath"
 
-    $arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -Elevated"
+    #$scriptPath = $PSCommandPath
+    $arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"$PSCommandPath`" -Elevated"
     if ($SkipBloatware) { $arguments += " -SkipBloatware" }
     if ($SkipWSL) { $arguments += " -SkipWSL" }
-    if ($Config -ne ".\config.ps1") { $arguments += " -Config `"$Config`"" }
+    if ($Config -ne ".\config.ps1") { $arguments += " -Config '$Config'" }
 
     Start-Process powershell -Verb RunAs -ArgumentList $arguments
     exit
@@ -230,7 +232,7 @@ if (-not ($Elevated -or $UserPhase)) {
 ################################################################################
 # Load Configuration
 ################################################################################
-
+Write-Info "Loading configuration from: $Config"
 if (-not (Test-Path $Config)) {
     Write-Error "Configuration file not found: $Config"
     Write-Info "Please copy config.example.ps1 to config.ps1 and customize it"
@@ -238,7 +240,6 @@ if (-not (Test-Path $Config)) {
     exit 1
 }
 
-Write-Info "Loading configuration from: $Config"
 . $Config
 
 ################################################################################
@@ -285,12 +286,12 @@ if ($Elevated) {
 
             # Remove provisioned packages
             Get-AppxProvisionedPackage -Online |
-                Where-Object DisplayName -Like $pattern |
-                Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Out-Null
+            Where-Object DisplayName -Like $pattern |
+            Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Out-Null
 
             # Remove installed packages
             Get-AppxPackage -AllUsers -Name $pattern |
-                Remove-AppxPackage -ErrorAction SilentlyContinue | Out-Null
+            Remove-AppxPackage -ErrorAction SilentlyContinue | Out-Null
         }
 
         Write-Success "Bloatware removal complete"
@@ -307,43 +308,43 @@ if ($Elevated) {
 
     if ($ShowFileExtensions) {
         Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" `
-                         -Name "HideFileExt" -Value 0
+            -Name "HideFileExt" -Value 0
     }
 
     if ($ShowHiddenFiles) {
         Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" `
-                         -Name "Hidden" -Value 1
+            -Name "Hidden" -Value 1
     }
 
     if ($ShowFullPathInTitleBar) {
         Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState" `
-                         -Name "FullPath" -Value 1
+            -Name "FullPath" -Value 1
     }
 
     # Set File Explorer to open to This PC
     if ($OpenFileExplorerTo -eq "ThisPC") {
         Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" `
-                         -Name "LaunchTo" -Value 1
+            -Name "LaunchTo" -Value 1
     }
 
     # Taskbar Settings
     Write-Info "Configuring Taskbar..."
 
     Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" `
-                     -Name "SearchboxTaskbarMode" -Value $TaskbarSearchBoxMode
+        -Name "SearchboxTaskbarMode" -Value $TaskbarSearchBoxMode
 
     if (-not $TaskbarShowTaskView) {
         Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" `
-                         -Name "ShowTaskViewButton" -Value 0
+            -Name "ShowTaskViewButton" -Value 0
     }
 
     # Dark Mode
     if ($UseDarkMode) {
         Write-Info "Enabling Dark Mode..."
         Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" `
-                         -Name "AppsUseLightTheme" -Value 0
+            -Name "AppsUseLightTheme" -Value 0
         Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" `
-                         -Name "SystemUsesLightTheme" -Value 0
+            -Name "SystemUsesLightTheme" -Value 0
     }
 
     # Privacy Settings
@@ -351,26 +352,26 @@ if ($Elevated) {
 
     if ($DisableTelemetry) {
         Set-RegistryValue -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" `
-                         -Name "AllowTelemetry" -Value 0
+            -Name "AllowTelemetry" -Value 0
     }
 
     if ($DisableAdvertisingId) {
         Set-RegistryValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" `
-                         -Name "Enabled" -Value 0
+            -Name "Enabled" -Value 0
     }
 
     if ($DisableLocationTracking) {
         Set-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" `
-                         -Name "Value" -Value "Deny" -Type "String"
+            -Name "Value" -Value "Deny" -Type "String"
     }
 
     # Performance Settings
     if ($DisableAnimations) {
         Write-Info "Disabling animations for better performance..."
         Set-RegistryValue -Path "HKCU:\Control Panel\Desktop\WindowMetrics" `
-                         -Name "MinAnimate" -Value 0
+            -Name "MinAnimate" -Value 0
         Set-RegistryValue -Path "HKCU:\Control Panel\Desktop" `
-                         -Name "UserPreferencesMask" -Value ([byte[]](144,18,3,128,16,0,0,0))
+            -Name "UserPreferencesMask" -Value ([byte[]](144, 18, 3, 128, 16, 0, 0, 0))
     }
 
     Write-Success "Windows system settings configured"
@@ -558,8 +559,13 @@ if ($Elevated) {
 
     Write-Section "Installing NuGet Artifacts Credential Provider"
     Write-Info "Downloading and installing..."
-    Invoke-Expression "& { $(Invoke-RestMethod https://aka.ms/install-artifacts-credprovider.ps1) } -AddNetfx"
-    Write-Success "NuGet Artifacts Credential Provider installed"
+    try {
+        Invoke-Expression "& { $(Invoke-RestMethod https://aka.ms/install-artifacts-credprovider.ps1) } -AddNetfx"
+        Write-Success "NuGet Artifacts Credential Provider installed"
+    }
+    catch {
+        Write-Warning "Failed to install NuGet Artifacts Credential Provider: $_"
+    }
 
     #---------------------------------------------------------------------------
     # Phase 1 Complete - Launch Phase 2
@@ -637,7 +643,8 @@ if ($UserPhase) {
 
     # User info
     if ($GitUserName -and $GitUserEmail) {
-        Write-Info "Setting Git user: $GitUserName <$GitUserEmail>"
+        # Removed angle brackets around email to avoid output issue
+        Write-Info "Setting Git user: $GitUserName $GitUserEmail"
         git config --global user.name $GitUserName
         git config --global user.email $GitUserEmail
     }
@@ -704,7 +711,9 @@ build/
     while (-not (Get-Command code -ErrorAction SilentlyContinue) -and $attempt -le $maxAttempts) {
         Write-Info "Waiting for VS Code to be available (attempt $attempt/$maxAttempts)..."
         Start-Sleep -Seconds 3
-        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+        # Standard order (User before Machine)
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "Machine")
+        # increase attempt counter
         $attempt++
     }
 
@@ -727,6 +736,7 @@ build/
     foreach ($package in $NpmGlobalPackages) {
         # Check if already installed
         $installed = npm list -g $package 2>$null
+
         if ($LASTEXITCODE -eq 0) {
             Write-Info "✓ $package already installed"
         }

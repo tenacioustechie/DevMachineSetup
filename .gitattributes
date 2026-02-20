@@ -1,0 +1,3 @@
+# PowerShell scripts require CRLF line endings for Windows PowerShell 5.1
+# (here-string terminators are not recognized with LF-only endings)
+*.ps1 eol=crlf
