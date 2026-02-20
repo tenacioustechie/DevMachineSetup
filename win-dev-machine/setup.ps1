@@ -219,7 +219,6 @@ if (-not ($Elevated -or $UserPhase)) {
     Write-Info "Launching Phase 1 (Admin) with elevation..."
     Write-Info "Script path $PSCommandPath"
 
-    #$scriptPath = $PSCommandPath
     $arguments = "-NoProfile -ExecutionPolicy Bypass -Command `"$PSCommandPath`" -Elevated"
     if ($SkipBloatware) { $arguments += " -SkipBloatware" }
     if ($SkipWSL) { $arguments += " -SkipWSL" }
