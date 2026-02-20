@@ -1,17 +1,82 @@
 # Windows Development Machine Setup
 
-Automated setup for Windows 11 development environments using PowerShell. This setup is designed for developers working with Node.js, TypeScript, .NET, C#, and web applications.
+Automated setup for Windows 11 development environments using PowerShell. Designed for developers working with Node.js, TypeScript, .NET, C#, and web applications.
 
 ## Features
 
-- **Simple PowerShell Scripts**: Direct PowerShell scripts with colored output
-- **Two-Phase Setup**: Automatic elevation handling (admin phase + user phase)
-- **Idempotent**: Safe to run multiple times without causing issues
-- **Comprehensive**: Installs development tools, configures system settings, removes bloatware
-- **Customizable**: Easy to modify via configuration file
-- **Fast**: No framework overhead, runs directly on Windows
+- **Modular Scripts**: Separate scripts for admin and user tasks, with shared helper functions
+- **Two-Phase Setup**: Admin phase (elevated) installs software, user phase configures tools
+- **Standalone Phases**: Run each phase independently for partial setups or retries
+- **Idempotent**: Safe to run multiple times - skips already-installed packages
+- **Customizable**: All software and settings controlled via a single configuration file
+- **Logged**: All output written to `%TEMP%\dev-setup.log` for debugging
 
-## What Gets Configured
+## Prerequisites
+
+- Windows 10 or 11
+- PowerShell 5.1+
+- Administrator access
+- Internet connection
+
+## Quick Start
+
+1. **Clone this repository**:
+   ```powershell
+   git clone <repository-url>
+   cd DevMachineSetup\win-dev-machine
+   ```
+
+2. **Create your configuration file**:
+   ```powershell
+   Copy-Item config.example.ps1 config.ps1
+   ```
+
+3. **Customize your setup** (optional but recommended):
+   ```powershell
+   code config.ps1
+   ```
+   Set your Git name and email, modify package lists, adjust system preferences.
+
+4. **Run the setup**:
+   ```powershell
+   .\setup.ps1
+   ```
+
+5. **Follow the prompts**:
+   - Approve the UAC elevation prompt
+   - Phase 1 (Admin): Installs software, configures system settings, removes bloatware
+   - Phase 2 (User): Configures Git, VS Code extensions, npm packages, WSL
+
+6. **Clone your repositories** (optional):
+   ```powershell
+   .\clone-repos.ps1
+   ```
+
+## Directory Structure
+
+```
+win-dev-machine/
+├── setup.ps1              # Entry point - orchestrates both phases
+├── setup-admin.ps1        # Phase 1: Admin tasks (elevated)
+├── setup-user.ps1         # Phase 2: User tasks (non-elevated)
+├── functions.ps1          # Shared helper functions
+├── clone-repos.ps1        # Repository cloning script
+├── config.example.ps1     # Configuration template
+├── config.ps1             # Your custom configuration (gitignored)
+└── README.md              # This file
+```
+
+### Script Responsibilities
+
+| Script | Elevation | Purpose |
+|--------|-----------|---------|
+| `setup.ps1` | No | Entry point. Runs pre-flight checks, launches admin phase elevated, then runs user phase. |
+| `setup-admin.ps1` | Yes (Admin) | Removes bloatware, configures Windows settings, installs all software via winget, installs WSL. |
+| `setup-user.ps1` | No | Configures Git, GitHub CLI auth, VS Code extensions, npm packages, WSL first-run setup. |
+| `functions.ps1` | N/A | Shared helpers: colored output, logging, winget/VS Code installers, registry helpers. |
+| `clone-repos.ps1` | No | Clones configured GitHub repositories. |
+
+## What Gets Installed
 
 ### Development Tools
 - **Node.js**: via fnm (Fast Node Manager) - latest LTS by default
@@ -37,224 +102,104 @@ Automated setup for Windows 11 development environments using PowerShell. This s
 - **Sysinternals Suite**: System administration utilities
 
 ### Communication & Productivity
-- **Zoom**: Video conferencing
-- **1Password**: Password manager
-- **Notion**: Note-taking and collaboration
-- **Obsidian**: Knowledge management
-- **LINQPad**: .NET scratchpad
+- Zoom, 1Password, Notion, Obsidian, LINQPad
 
 ### Fonts
-- JetBrains Mono
-- Fira Code
-- Cascadia Code
-- Hack Nerd Font
+- JetBrains Mono, Fira Code, Cascadia Code, Hack Nerd Font
 
 ### Windows System Settings
 - **Explorer**: Show file extensions, hidden files, full path in title bar
 - **Taskbar**: Customizable search box, task view button
 - **Privacy**: Disable telemetry, advertising ID, location tracking
 - **Dark Mode**: System-wide dark theme
-- **Performance**: Optional animation disabling for better performance
 - **Bloatware Removal**: Removes unnecessary Windows apps
 
 ### WSL (Windows Subsystem for Linux)
-- Ubuntu LTS installation
-- Automatic zsh and oh-my-zsh setup
-- Development tools (git, build-essential)
-- WSL 2 for better performance
+- Ubuntu LTS with WSL 2
+- Optional zsh and oh-my-zsh setup
+- Development tools (git, build-essential, curl, wget)
 
 ### VS Code Extensions
-- C# DevKit, C# extension
-- ESLint, Prettier
-- Docker, Kubernetes
-- Remote - WSL, Remote - Containers
-- GitLens
-- GitHub Copilot
-- Claude Code (Claude Dev)
-- Material Icon Theme
-- And more...
-
-## Prerequisites
-
-- Windows 11 (or Windows 10 with recent updates)
-- PowerShell 5.1+ (PowerShell 7+ recommended)
-- Administrator access
-- Internet connection
-
-## Quick Start
-
-1. **Clone this repository**:
-   ```powershell
-   git clone <repository-url>
-   cd DevMachineSetup\win-dev-machine
-   ```
-
-2. **Create your configuration file**:
-   ```powershell
-   Copy-Item config.example.ps1 config.ps1
-   ```
-
-3. **Customize your setup** (optional but recommended):
-   ```powershell
-   notepad config.ps1
-   # or
-   code config.ps1
-
-   # Set your Git name and email
-   # Modify package lists to add/remove software
-   # Adjust system preferences to your liking
-   ```
-
-4. **Run the setup script**:
-   ```powershell
-   .\setup.ps1
-   ```
-
-5. **Follow the prompts**:
-   - Script will auto-elevate for admin tasks
-   - Phase 1 (Admin): Installs software and configures system
-   - Phase 2 (User): Configures WSL, Git, VS Code extensions
-   - Total time: 20-40 minutes depending on internet speed
-
-6. **Clone your repositories** (optional):
-   ```powershell
-   .\clone-repos.ps1
-   ```
-
-## Directory Structure
-
-```
-win-dev-machine/
-├── setup.ps1              # Main setup script
-├── clone-repos.ps1        # Repository cloning script
-├── config.example.ps1     # Configuration template
-├── config.ps1             # Your custom configuration (gitignored)
-└── README.md              # This file
-```
-
-## Configuration
-
-All customization is done in [config.ps1](config.example.ps1). Copy the example and modify:
-
-### Basic Configuration
-
-```powershell
-# Git settings
-$GitUserName = "Your Name"
-$GitUserEmail = "your.email@example.com"
-$GitDefaultBranch = "main"
-
-# Node.js version
-$NodeVersion = "lts"  # or "20.15.0" for specific version
-
-# .NET versions
-$DotNetSDKs = @("8", "9")
-```
-
-### Adding/Removing Software
-
-```powershell
-# Add a new package
-$CoreDevTools = @(
-    "Git.Git"
-    "Microsoft.VisualStudioCode"
-    "MyNewTool.Package"  # Add this
-)
-
-# Comment out unwanted packages
-$TextEditors = @(
-    "Notepad++.Notepad++"
-    # "SublimeHQ.SublimeText.4"  # Commented out
-)
-```
-
-### Windows System Settings
-
-```powershell
-# Explorer settings
-$ShowFileExtensions = $true
-$ShowHiddenFiles = $true
-
-# Privacy settings
-$DisableTelemetry = $true
-$DisableAdvertisingId = $true
-
-# Dark mode
-$UseDarkMode = $true
-```
-
-### Repository Cloning
-
-```powershell
-# Configure for clone-repos.ps1
-$GitHubOrg = "YourOrgName"
-$RepositoriesToClone = @(
-    "repo1"
-    "repo2"
-    "repo3"
-)
-$CodeDirectory = "C:\Code"
-```
+- C# DevKit, ESLint, Prettier, Docker, Kubernetes
+- Remote WSL, Remote Containers, GitLens
+- GitHub Copilot, Claude Code, Material Icon Theme, and more
 
 ## Command Line Options
 
 ```powershell
-# Full setup
+# Full setup (admin + user phases)
 .\setup.ps1
 
 # Skip bloatware removal
 .\setup.ps1 -SkipBloatware
 
-# Skip WSL installation
+# Skip WSL installation and configuration
 .\setup.ps1 -SkipWSL
 
-# Use custom configuration file
+# Use a custom configuration file
 .\setup.ps1 -Config .\my-config.ps1
+
+# Combine options
+.\setup.ps1 -SkipBloatware -SkipWSL
+
+# Run phases independently
+.\setup-admin.ps1                  # Must run as Administrator
+.\setup-user.ps1                   # Run as normal user
+.\setup-admin.ps1 -SkipBloatware   # Admin phase without bloatware removal
 
 # Clone repositories
 .\clone-repos.ps1
 ```
 
-## Updating Your Environment
+## Configuration
 
-To update installed packages and apply configuration changes:
+All customization is done in `config.ps1`. Copy the example template and modify:
 
 ```powershell
-.\setup.ps1
+Copy-Item config.example.ps1 config.ps1
 ```
 
-The script is idempotent and will skip already-installed packages.
+### Key Settings
 
-## Maintenance
-
-### Keeping Software Updated
-
-Update winget packages:
 ```powershell
-winget upgrade --all
+# Git
+$GitUserName = "Your Name"
+$GitUserEmail = "your.email@example.com"
+
+# Node.js - "lts" or a specific version like "20.15.0"
+$NodeVersion = "lts"
+
+# .NET SDK versions to install
+$DotNetSDKs = @("8", "9")
+
+# Windows settings
+$UseDarkMode = $true
+$ShowFileExtensions = $true
+$DisableTelemetry = $true
 ```
 
-Update npm global packages:
+### Adding/Removing Software
+
+Each software category is an array of winget package IDs. Add or comment out entries:
+
 ```powershell
-npm update -g
+$CoreDevTools = @(
+    "Git.Git"
+    "Microsoft.VisualStudioCode"
+    "MyNewTool.Package"            # Add new packages
+    # "Docker.DockerDesktop"       # Comment out to skip
+)
 ```
 
-Update WSL:
+Find package IDs with `winget search <name>`.
+
+### Repository Cloning
+
 ```powershell
-wsl --update
+$GitHubOrg = "YourOrgName"
+$RepositoriesToClone = @("repo1", "repo2", "repo3")
+$CodeDirectory = "C:\Code"
 ```
-
-### Re-running After Windows Updates
-
-After major Windows updates, re-run the setup:
-```powershell
-.\setup.ps1
-```
-
-This will:
-- Reinstall any missing components
-- Reapply system settings
-- Update development tools
 
 ## Troubleshooting
 
@@ -266,32 +211,28 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ### Winget Not Found
 
-Install App Installer from Microsoft Store, or run:
+Install App Installer from the Microsoft Store, or run:
 ```powershell
 Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
 ```
 
 ### Package Installation Fails
 
-Try updating winget:
+Update winget sources and retry:
 ```powershell
 winget source update
-```
-
-Or install manually:
-```powershell
 winget install --id <package-id>
 ```
 
 ### VS Code Extensions Fail
 
-If VS Code isn't in PATH immediately:
-1. Restart PowerShell
-2. Manually install extensions: `code --install-extension <extension-id>`
+If VS Code isn't in PATH after installation, restart your terminal or run the user phase again:
+```powershell
+.\setup-user.ps1
+```
 
 ### WSL Installation Issues
 
-If WSL fails to install:
 1. Enable virtualization in BIOS
 2. Run: `wsl --install --no-distribution`
 3. Restart computer
@@ -304,195 +245,69 @@ Restart your terminal to refresh PATH, or manually add:
 $env:Path += ";$env:LOCALAPPDATA\fnm"
 ```
 
-### Git Credential Manager Issues
+### Checking the Log File
 
-If authentication fails:
+All script output is logged for debugging:
 ```powershell
-git config --global credential.helper manager
+notepad $env:TEMP\dev-setup.log
 ```
 
-## Two-Phase Setup Explained
+## Maintenance
 
-The setup uses a two-phase approach for security and reliability:
+### Keeping Software Updated
 
-**Phase 1 (Administrator)**:
-- Runs with elevated privileges
-- Removes bloatware
-- Configures Windows system settings
-- Installs all software via winget
-- Installs WSL (but doesn't launch it)
-- Automatically launches Phase 2 when complete
+```powershell
+winget upgrade --all       # Update all winget packages
+npm update -g              # Update global npm packages
+wsl --update               # Update WSL
+```
 
-**Phase 2 (User-level)**:
-- Runs without elevation (normal user)
-- Configures WSL (username/password setup)
-- Sets up Git configuration
-- Authenticates with GitHub CLI
-- Installs VS Code extensions
-- Installs global npm packages
+### Re-running After Changes
 
-This separation ensures:
-- Security: Minimal actions run as admin
-- Reliability: User-level configs don't need elevation
-- Better experience: WSL setup is interactive
+The scripts are idempotent. Re-run anytime to apply config changes or reinstall missing tools:
+```powershell
+.\setup.ps1
+```
+
+Or run individual phases:
+```powershell
+.\setup-admin.ps1    # Re-run admin tasks only
+.\setup-user.ps1     # Re-run user tasks only
+```
 
 ## Migration to New PC
 
-To set up a new Windows PC with your existing configuration:
-
-1. **On your old PC**:
-   - Commit any custom changes to `config.ps1`
-   - Push changes to your repository (or copy config.ps1)
-
+1. **From your old PC**: Copy or commit your `config.ps1`
 2. **On your new PC**:
-   - Clone the repository
-   - Copy your `config.ps1`
-   - Run `.\setup.ps1`
-   - Run `.\clone-repos.ps1`
-
-3. **Manually migrate**:
-   - SSH keys from `~\.ssh\`
-   - VS Code settings (or use Settings Sync)
-   - Application-specific data
-
-4. **Optional**: Use Windows Backup for:
-   - User files and documents
-   - Application settings not covered by automation
-
-## Architecture
-
-This setup uses a straightforward PowerShell approach:
-
-1. **setup.ps1** loads **config.ps1**
-2. Auto-elevates for Phase 1 (admin tasks)
-3. Phase 1 installs software and configures system
-4. Phase 1 launches Phase 2 (user tasks)
-5. Phase 2 configures user-level settings
-6. Each step checks if already completed (idempotent)
-7. Colored output shows progress
-
-This matches the Mac setup approach - simple, direct, and effective!
-
-## Comparison to Old Script
-
-**Improvements over old `runme.ps1`**:
-
-1. **Configuration File**: Separate config.ps1 (gitignored)
-2. **Colored Output**: Clear progress indicators
-3. **Better Idempotency**: Checks before installing
-4. **More Tools**: fnm, Kubernetes, Bruno, more fonts
-5. **System Settings**: Configures Windows preferences
-6. **Separate Repo Script**: clone-repos.ps1 for flexibility
-7. **Better Documentation**: Comprehensive README
-8. **Latest Node**: Uses fnm with LTS auto-install
-9. **.NET 9**: Includes latest .NET version
-10. **VS Code Extensions**: Automated installation
-
-## Finding Package IDs
-
-### Winget Packages
-
-```powershell
-# Search for a package
-winget search "package name"
-
-# Get exact ID
-winget show "Package.ID"
-
-# Example
-winget search vscode
-winget show Microsoft.VisualStudioCode
-```
-
-### VS Code Extensions
-
-Visit [VS Code Marketplace](https://marketplace.visualstudio.com/) or:
-
-```powershell
-# List installed extensions
-code --list-extensions
-
-# Search in marketplace
-# Extension ID format: publisher.extension-name
-```
-
-## Alternative Tools Mentioned
-
-### API Testing
-- **Postman**: Full-featured, popular
-- **Bruno**: Lightweight, open-source, Git-friendly
-- **Insomnia**: REST/GraphQL client
-- **Thunder Client**: VS Code extension
-- **REST Client**: VS Code extension for .http files
-
-### File Managers
-- **Total Commander**: Powerful (paid)
-- **Double Commander**: Free alternative
-
-### Image Editors
-- **Paint.NET**: Simple, fast
-- **GIMP**: Full-featured, free Photoshop alternative
-
-## Resources
-
-- [Winget Documentation](https://docs.microsoft.com/en-us/windows/package-manager/winget/)
-- [fnm (Fast Node Manager)](https://github.com/Schniz/fnm)
-- [PowerToys](https://docs.microsoft.com/en-us/windows/powertoys/)
-- [WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
-- [VS Code Documentation](https://code.visualstudio.com/docs)
-
-## License
-
-This setup configuration is provided as-is for personal use. Modify as needed for your environment.
-
----
+   ```powershell
+   git clone <repository-url>
+   cd DevMachineSetup\win-dev-machine
+   # Copy your config.ps1 into this directory
+   .\setup.ps1
+   .\clone-repos.ps1
+   ```
+3. **Manually migrate**: SSH keys (`~\.ssh\`), VS Code settings (or use Settings Sync)
 
 ## Quick Reference
 
-### Common Commands
-
 ```powershell
-# Full setup
-.\setup.ps1
-
-# Clone repositories
-.\clone-repos.ps1
-
-# Update all winget packages
-winget upgrade --all
-
-# Update npm packages
-npm update -g
-
-# List installed winget packages
-winget list
-
-# Check Node versions
-fnm list
-
-# Switch Node version
-fnm use 18.18.0
+.\setup.ps1                # Full setup
+.\setup-admin.ps1          # Admin tasks only
+.\setup-user.ps1           # User tasks only
+.\clone-repos.ps1          # Clone repositories
+winget upgrade --all       # Update all packages
+fnm list                   # List installed Node versions
+fnm use 20                 # Switch Node version
 ```
 
 ### File Locations After Setup
 
-- Node.js: Managed by fnm in `%LOCALAPPDATA%\fnm\`
-- Git config: `~\.gitconfig`
-- Global .gitignore: `~\.gitignore_global`
-- VS Code settings: `%APPDATA%\Code\User\`
-- Configuration: `.\config.ps1`
-- Repositories: `C:\Code\` (or configured path)
-
-### Next Steps After Setup
-
-1. Open VS Code and sign into Settings Sync (if used)
-2. Generate SSH key: `ssh-keygen -t ed25519 -C "your.email@example.com"`
-3. Add SSH key to GitHub/GitLab
-4. Run `.\clone-repos.ps1` to clone your projects
-5. Start Docker Desktop if needed
-6. Configure any application-specific settings
-7. Review Windows settings in Settings app
-
----
-
-**Need help?** Check the troubleshooting section above or open an issue.
+| Item | Location |
+|------|----------|
+| Node.js | `%LOCALAPPDATA%\fnm\` |
+| Git config | `~\.gitconfig` |
+| Global .gitignore | `~\.gitignore_global` |
+| VS Code settings | `%APPDATA%\Code\User\` |
+| Setup log | `%TEMP%\dev-setup.log` |
+| Configuration | `.\config.ps1` |
+| Repositories | `C:\Code\` (or configured path) |
