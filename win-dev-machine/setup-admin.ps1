@@ -174,14 +174,14 @@ Write-Ok "Windows system settings configured"
 ################################################################################
 
 Write-Section "Installing Core Development Tools"
-Install-WingetPackages -Packages $CoreDevTools -Category "core development tools"
+Invoke-WingetInstallList -Packages $CoreDevTools -Category "core development tools"
 
 Write-Info "Setting Windows Terminal as default console..."
 Set-RegistryValue -Path "HKCU:\Console" -Name "DelegationConsole" -Value 1 -Type DWord
 
 # fnm and Node.js
 Write-Section "Installing fnm (Fast Node Manager)"
-Install-WingetPackage -PackageId "Schniz.fnm" -Name "fnm"
+Invoke-WingetInstall -PackageId "Schniz.fnm" -Name "fnm"
 
 $env:Path += ";$env:LOCALAPPDATA\fnm"
 
@@ -206,61 +206,61 @@ if ($nodeVer) {
 if ($null -ne $DotNetSDKs -and $DotNetSDKs.Count -gt 0) {
     Write-Section "Installing .NET SDKs"
     foreach ($version in $DotNetSDKs) {
-        Install-WingetPackage -PackageId "Microsoft.DotNet.SDK.$version" -Name ".NET SDK $version"
-        Install-WingetPackage -PackageId "Microsoft.DotNet.HostingBundle.$version" -Name ".NET Hosting Bundle $version"
-        Install-WingetPackage -PackageId "Microsoft.DotNet.AspNetCore.$version" -Name ".NET AspNetCore $version"
+        Invoke-WingetInstall -PackageId "Microsoft.DotNet.SDK.$version" -Name ".NET SDK $version"
+        Invoke-WingetInstall -PackageId "Microsoft.DotNet.HostingBundle.$version" -Name ".NET Hosting Bundle $version"
+        Invoke-WingetInstall -PackageId "Microsoft.DotNet.AspNetCore.$version" -Name ".NET AspNetCore $version"
     }
 }
 
 # Python
 if ($PythonVersion) {
     Write-Section "Installing Python"
-    Install-WingetPackage -PackageId "Python.Python.$PythonVersion" -Name "Python $PythonVersion"
+    Invoke-WingetInstall -PackageId "Python.Python.$PythonVersion" -Name "Python $PythonVersion"
 }
 
 # Package categories
 Write-Section "Installing Database Tools"
-Install-WingetPackages -Packages $DatabaseTools -Category "database tools"
+Invoke-WingetInstallList -Packages $DatabaseTools -Category "database tools"
 
 Write-Section "Installing API Testing Tools"
-Install-WingetPackages -Packages $APITestingTools -Category "API testing tools"
+Invoke-WingetInstallList -Packages $APITestingTools -Category "API testing tools"
 
 Write-Section "Installing Cloud & DevOps Tools"
-Install-WingetPackages -Packages $CloudDevOpsTools -Category "cloud & DevOps tools"
+Invoke-WingetInstallList -Packages $CloudDevOpsTools -Category "cloud & DevOps tools"
 
 Write-Section "Installing Kubernetes Tools"
-Install-WingetPackages -Packages $KubernetesTools -Category "Kubernetes tools"
+Invoke-WingetInstallList -Packages $KubernetesTools -Category "Kubernetes tools"
 
 Write-Section "Installing Code Comparison Tools"
-Install-WingetPackages -Packages $MergeTools -Category "merge tools"
+Invoke-WingetInstallList -Packages $MergeTools -Category "merge tools"
 
 Write-Section "Installing Text Editors"
-Install-WingetPackages -Packages $TextEditors -Category "text editors"
+Invoke-WingetInstallList -Packages $TextEditors -Category "text editors"
 
 Write-Section "Installing File Managers"
-Install-WingetPackages -Packages $FileManagers -Category "file managers"
+Invoke-WingetInstallList -Packages $FileManagers -Category "file managers"
 
 Write-Section "Installing Image Editors"
-Install-WingetPackages -Packages $ImageEditors -Category "image editors"
+Invoke-WingetInstallList -Packages $ImageEditors -Category "image editors"
 
 Write-Section "Installing System Utilities"
-Install-WingetPackages -Packages $SystemUtilities -Category "system utilities"
+Invoke-WingetInstallList -Packages $SystemUtilities -Category "system utilities"
 
 Write-Section "Installing Browsers"
-Install-WingetPackages -Packages $Browsers -Category "browsers"
+Invoke-WingetInstallList -Packages $Browsers -Category "browsers"
 
 Write-Section "Installing Communication & Productivity Tools"
-Install-WingetPackages -Packages $ProductivityTools -Category "productivity tools"
+Invoke-WingetInstallList -Packages $ProductivityTools -Category "productivity tools"
 
 Write-Section "Installing Other Tools"
-Install-WingetPackages -Packages $OtherTools -Category "other tools"
+Invoke-WingetInstallList -Packages $OtherTools -Category "other tools"
 
 Write-Section "Installing Developer Fonts"
-Install-WingetPackages -Packages $Fonts -Category "fonts"
+Invoke-WingetInstallList -Packages $Fonts -Category "fonts"
 
 # Git Credential Manager
 Write-Section "Installing Git Credential Manager"
-Install-WingetPackage -PackageId "Microsoft.GitCredentialManager" -Name "Git Credential Manager"
+Invoke-WingetInstall -PackageId "Microsoft.GitCredentialManager" -Name "Git Credential Manager"
 
 ################################################################################
 # Install WSL

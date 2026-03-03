@@ -139,7 +139,7 @@ function Confirm-ConfigPath {
 # Winget Helpers
 ################################################################################
 
-function Install-WingetPackage {
+function Invoke-WingetInstall {
     param(
         [Parameter(Mandatory = $true)]
         [string]$PackageId,
@@ -150,7 +150,7 @@ function Install-WingetPackage {
 
     $displayName = if ($Name) { $Name } else { $PackageId }
 
-    $installed = winget list --id $PackageId --exact 2>$null
+    $installed = winget list --id $PackageId --exact --accept-source-agreements 2>$null
     if ($LASTEXITCODE -eq 0 -and $installed -match $PackageId) {
         Write-Info "$displayName already installed"
         return $true
@@ -169,7 +169,7 @@ function Install-WingetPackage {
     }
 }
 
-function Install-WingetPackages {
+function Invoke-WingetInstallList {
     param(
         [Parameter(Mandatory = $true)]
         [array]$Packages,
@@ -186,8 +186,7 @@ function Install-WingetPackages {
     Write-Info "Installing $($Packages.Count) $Category..."
 
     foreach ($package in $Packages) {
-        Write-Info "Installing $package..."
-        Install-WingetPackage -PackageId $package
+        Invoke-WingetInstall -PackageId $package
     }
 
     Write-Ok "$Category installation complete"
