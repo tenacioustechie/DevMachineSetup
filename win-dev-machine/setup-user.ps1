@@ -34,7 +34,8 @@ param(
 
 # Load shared functions and config
 . "$PSScriptRoot\functions.ps1"
-Load-Config -ConfigPath $Config
+Confirm-ConfigPath -ConfigPath $Config
+. $Config
 
 Write-Section "User-Level Setup"
 

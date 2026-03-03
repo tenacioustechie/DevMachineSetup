@@ -119,7 +119,7 @@ function Set-RegistryValue {
 # Configuration Loading
 ################################################################################
 
-function Load-Config {
+function Confirm-ConfigPath {
     param(
         [Parameter(Mandatory = $true)]
         [string]$ConfigPath
@@ -133,7 +133,6 @@ function Load-Config {
     }
 
     Write-Info "Loading configuration from: $ConfigPath"
-    . $ConfigPath
 }
 
 ################################################################################
