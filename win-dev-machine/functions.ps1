@@ -71,10 +71,10 @@ function Write-ColorOutput {
     Write-Log "[$Type] $Message"
 }
 
-function Write-Info    { param([string]$Message) Write-ColorOutput -Message $Message -Type Info }
-function Write-Ok      { param([string]$Message) Write-ColorOutput -Message $Message -Type Success }
-function Write-Warn    { param([string]$Message) Write-ColorOutput -Message $Message -Type Warning }
-function Write-Err     { param([string]$Message) Write-ColorOutput -Message $Message -Type Error }
+function Write-Info { param([string]$Message) Write-ColorOutput -Message $Message -Type Info }
+function Write-Ok { param([string]$Message) Write-ColorOutput -Message $Message -Type Success }
+function Write-Warn { param([string]$Message) Write-ColorOutput -Message $Message -Type Warning }
+function Write-Err { param([string]$Message) Write-ColorOutput -Message $Message -Type Error }
 function Write-Section { param([string]$Message) Write-ColorOutput -Message $Message -Type Section }
 
 ################################################################################
@@ -89,7 +89,7 @@ function Test-IsAdmin {
 }
 
 function Update-PathFromRegistry {
-    $userPath    = [System.Environment]::GetEnvironmentVariable("Path", "User")
+    $userPath = [System.Environment]::GetEnvironmentVariable("Path", "User")
     $machinePath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
     $env:Path = "$machinePath;$userPath"
 }
@@ -186,6 +186,7 @@ function Install-WingetPackages {
     Write-Info "Installing $($Packages.Count) $Category..."
 
     foreach ($package in $Packages) {
+        Write-Info "Installing $package..."
         Install-WingetPackage -PackageId $package
     }
 
