@@ -103,6 +103,11 @@ else {
 
 Update-PathFromRegistry
 
+# Initialize fnm in current session so node/npm are available for Phase 2
+if (Get-Command fnm -ErrorAction SilentlyContinue) {
+    fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+}
+
 ################################################################################
 # Phase 2: User Tasks (current session)
 ################################################################################

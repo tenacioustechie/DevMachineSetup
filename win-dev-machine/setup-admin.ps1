@@ -202,6 +202,28 @@ if ($nodeVer) {
     Write-Ok "Node.js installed: $nodeVer"
 }
 
+# Add fnm shell initialization to PowerShell profile so node/npm are available in new terminals
+Write-Info "Configuring fnm shell initialization in PowerShell profile..."
+$profileDir = Split-Path $PROFILE -Parent
+if (-not (Test-Path $profileDir)) {
+    New-Item -Path $profileDir -ItemType Directory -Force | Out-Null
+}
+$fnmInitLine = 'fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression'
+if (Test-Path $PROFILE) {
+    $profileContent = Get-Content $PROFILE -Raw
+    if ($profileContent -notlike '*fnm env*') {
+        Add-Content -Path $PROFILE -Value "`n# fnm (Fast Node Manager) shell initialization`n$fnmInitLine"
+        Write-Ok "Added fnm initialization to PowerShell profile"
+    }
+    else {
+        Write-Info "fnm initialization already in PowerShell profile"
+    }
+}
+else {
+    "# fnm (Fast Node Manager) shell initialization`n$fnmInitLine" | Out-File -FilePath $PROFILE -Encoding UTF8
+    Write-Ok "Created PowerShell profile with fnm initialization"
+}
+
 # .NET SDKs
 if ($null -ne $DotNetSDKs -and $DotNetSDKs.Count -gt 0) {
     Write-Section "Installing .NET SDKs"

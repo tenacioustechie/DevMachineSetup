@@ -215,6 +215,14 @@ if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
     Update-PathFromRegistry
 }
 
+# Initialize fnm in current session if available (needed for node/npm to be on PATH)
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    if (Get-Command fnm -ErrorAction SilentlyContinue) {
+        Write-Info "Initializing fnm to make node/npm available..."
+        fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+    }
+}
+
 if (Get-Command npm -ErrorAction SilentlyContinue) {
     if ($null -ne $NpmGlobalPackages -and $NpmGlobalPackages.Count -gt 0) {
         foreach ($package in $NpmGlobalPackages) {
